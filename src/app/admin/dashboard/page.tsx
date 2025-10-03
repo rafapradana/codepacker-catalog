@@ -1,39 +1,27 @@
 import { AppSidebar } from "@/components/app-sidebar"
-import { ChartAreaInteractive } from "@/components/chart-area-interactive"
-import { DataTable } from "@/components/data-table"
-import { SectionCards } from "@/components/section-cards"
 import { SiteHeader } from "@/components/site-header"
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { DashboardStatsCards } from "@/components/dashboard-stats-cards"
+import { RecentProjectsTable } from "@/components/recent-projects-table"
+import { TopCategoriesChart } from "@/components/top-categories-chart"
+import { getDashboardStats } from "@/lib/dashboard-stats"
 
-import data from "./data.json"
+export default async function DashboardPage() {
+  const stats = await getDashboardStats();
 
-export default function Page() {
   return (
-    <SidebarProvider
-      style={
-        {
-          "--sidebar-width": "calc(var(--spacing) * 72)",
-          "--header-height": "calc(var(--spacing) * 12)",
-        } as React.CSSProperties
-      }
-    >
-      <AppSidebar variant="inset" />
+    <SidebarProvider>
+      <AppSidebar />
       <SidebarInset>
         <SiteHeader />
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
-            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <SectionCards />
-              <div className="px-4 lg:px-6">
-                <ChartAreaInteractive />
-              </div>
-              <DataTable data={data} />
-            </div>
+        <main className="@container/main flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+          <DashboardStatsCards stats={stats} />
+          
+          <div className="grid grid-cols-1 gap-4 lg:gap-6 @4xl/main:grid-cols-2">
+            <RecentProjectsTable projects={stats.recentProjects} />
+            <TopCategoriesChart categories={stats.topCategories} />
           </div>
-        </div>
+        </main>
       </SidebarInset>
     </SidebarProvider>
   )
