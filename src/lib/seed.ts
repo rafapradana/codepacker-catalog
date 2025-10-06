@@ -199,7 +199,6 @@ async function seed() {
       bio: 'Passionate full-stack developer with experience in modern web technologies.',
       githubUrl: 'https://github.com/johndoe',
       linkedinUrl: 'https://linkedin.com/in/johndoe',
-      profileComplete: true,
       classId: classesData[0].id
     });
 

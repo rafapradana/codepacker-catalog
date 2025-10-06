@@ -14,8 +14,6 @@ export interface DashboardStats {
     title: string;
     studentName: string;
     createdAt: Date;
-    viewsInternal: number;
-    viewsExternal: number;
   }>;
   topCategories: Array<{
     name: string;
@@ -49,11 +47,9 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     const recentProjects = await db
       .select({
         id: projects.id,
-        title: projects.title,
-        studentName: students.fullName,
-        createdAt: projects.createdAt,
-        viewsInternal: projects.viewsInternal,
-        viewsExternal: projects.viewsExternal,
+      title: projects.title,
+      studentName: students.fullName,
+      createdAt: projects.createdAt,
       })
       .from(projects)
       .leftJoin(students, sql`${projects.studentId} = ${students.id}`)

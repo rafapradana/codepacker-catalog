@@ -7,6 +7,8 @@ import {
   IconTag,
   IconStack2,
   IconBrain,
+  IconUsers,
+  IconFolder,
 } from "@tabler/icons-react"
 import Image from "next/image"
 
@@ -38,6 +40,16 @@ const data = {
       title: "Kelola Kelas",
       url: "/admin/kelola-kelas",
       icon: IconSchool,
+    },
+    {
+      title: "Kelola Siswa",
+      url: "/admin/kelola-siswa",
+      icon: IconUsers,
+    },
+    {
+      title: "Kelola Project",
+      url: "/admin/kelola-project",
+      icon: IconFolder,
     },
     {
       title: "Kelola Kategori",

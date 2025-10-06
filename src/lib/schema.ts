@@ -30,7 +30,6 @@ export const students = pgTable('students', {
   profilePhotoUrl: varchar('profile_photo_url', { length: 500 }),
   githubUrl: varchar('github_url', { length: 500 }),
   linkedinUrl: varchar('linkedin_url', { length: 500 }),
-  profileComplete: boolean('profile_complete').default(false).notNull(),
   classId: uuid('class_id').references(() => classes.id),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -92,8 +91,6 @@ export const projects = pgTable('projects', {
   categoryId: uuid('category_id').references(() => categories.id),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-  viewsInternal: integer('views_internal').default(0).notNull(),
-  viewsExternal: integer('views_external').default(0).notNull(),
 });
 
 // Student Skills junction table

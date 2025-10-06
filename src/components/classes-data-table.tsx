@@ -180,7 +180,7 @@ export function ClassesDataTable({ data }: ClassesDataTableProps) {
                 Tambah Kelas
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-lg">
               <DialogHeader>
                 <DialogTitle>Tambah Kelas Baru</DialogTitle>
                 <DialogDescription>
@@ -287,7 +287,7 @@ export function ClassesDataTable({ data }: ClassesDataTableProps) {
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Edit Kelas</DialogTitle>
             <DialogDescription>

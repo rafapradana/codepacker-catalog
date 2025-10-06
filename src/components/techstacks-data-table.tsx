@@ -403,17 +403,17 @@ export function TechStacksDataTable({ data: initialData }: TechStacksDataTablePr
                   <TableCell>
                     <div className="flex gap-1">
                       <div 
-                        className="w-4 h-4 rounded border border-gray-300"
+                        className="w-4 h-4 rounded border border-border"
                         style={{ backgroundColor: techstack.bgHex }}
                         title={`Background: ${techstack.bgHex}`}
                       />
                       <div 
-                        className="w-4 h-4 rounded border border-gray-300"
+                        className="w-4 h-4 rounded border border-border"
                         style={{ backgroundColor: techstack.borderHex }}
                         title={`Border: ${techstack.borderHex}`}
                       />
                       <div 
-                        className="w-4 h-4 rounded border border-gray-300"
+                        className="w-4 h-4 rounded border border-border"
                         style={{ backgroundColor: techstack.textHex }}
                         title={`Text: ${techstack.textHex}`}
                       />

@@ -403,17 +403,17 @@ export function SkillsDataTable({ data: initialData }: SkillsDataTableProps) {
                   <TableCell>
                     <div className="flex gap-1">
                       <div 
-                        className="w-4 h-4 rounded border border-gray-300"
+                        className="w-4 h-4 rounded border border-border"
                         style={{ backgroundColor: skill.bgHex }}
                         title={`Background: ${skill.bgHex}`}
                       />
                       <div 
-                        className="w-4 h-4 rounded border border-gray-300"
+                        className="w-4 h-4 rounded border border-border"
                         style={{ backgroundColor: skill.borderHex }}
                         title={`Border: ${skill.borderHex}`}
                       />
                       <div 
-                        className="w-4 h-4 rounded border border-gray-300"
+                        className="w-4 h-4 rounded border border-border"
                         style={{ backgroundColor: skill.textHex }}
                         title={`Text: ${skill.textHex}`}
                       />

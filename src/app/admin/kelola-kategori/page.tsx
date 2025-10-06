@@ -11,8 +11,15 @@ export default async function KelolaKategoriPage() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <SiteHeader title="Kelola Kategori" />
-        <main className="@container/main flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+        <SiteHeader />
+        <main className="@container/main flex flex-1 flex-col gap-6 p-6">
+          <div className="space-y-2">
+            <h1 className="text-2xl font-semibold tracking-tight">Kelola Kategori</h1>
+            <p className="text-sm text-muted-foreground">
+              Kelola kategori project siswa
+            </p>
+          </div>
+          
           <CategoriesDataTable data={categories} />
         </main>
       </SidebarInset>

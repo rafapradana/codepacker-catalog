@@ -17,124 +17,112 @@ interface DashboardStatsCardsProps {
 
 export function DashboardStatsCards({ stats }: DashboardStatsCardsProps) {
   return (
-    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-3 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-3">
-      <Card className="@container/card">
-        <CardHeader className="pb-2">
-          <CardDescription className="text-xs">Total Students</CardDescription>
-          <CardTitle className="text-xl font-semibold tabular-nums @[250px]/card:text-2xl">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/20">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-primary/10 p-2">
+              <IconUsers className="h-5 w-5 text-primary" />
+            </div>
+          </div>
+          <CardTitle className="text-3xl font-bold text-foreground">
             {stats.totalStudents.toLocaleString()}
           </CardTitle>
-          <CardAction>
-            <Badge variant="outline" className="text-xs">
-              <IconUsers className="size-3" />
-              Active
-            </Badge>
-          </CardAction>
         </CardHeader>
-        <CardFooter className="flex-col items-start gap-1 text-xs pt-0">
-          <div className="line-clamp-1 flex gap-1 font-medium">
-            Registered students <IconUsers className="size-3" />
-          </div>
+        <CardFooter className="pt-0">
+          <p className="text-sm text-muted-foreground">
+            Registered students in the system
+          </p>
         </CardFooter>
       </Card>
       
-      <Card className="@container/card">
-        <CardHeader className="pb-2">
-          <CardDescription className="text-xs">Total Projects</CardDescription>
-          <CardTitle className="text-xl font-semibold tabular-nums @[250px]/card:text-2xl">
+      <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-chart-1/5 to-chart-1/10 dark:from-chart-1/10 dark:to-chart-1/20">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-chart-1/10 p-2">
+              <IconFolder className="h-5 w-5 text-chart-1" />
+            </div>
+          </div>
+          <CardTitle className="text-3xl font-bold text-foreground">
             {stats.totalProjects.toLocaleString()}
           </CardTitle>
-          <CardAction>
-            <Badge variant="outline" className="text-xs">
-              <IconFolder className="size-3" />
-              Published
-            </Badge>
-          </CardAction>
         </CardHeader>
-        <CardFooter className="flex-col items-start gap-1 text-xs pt-0">
-          <div className="line-clamp-1 flex gap-1 font-medium">
-            Student projects <IconFolder className="size-3" />
-          </div>
+        <CardFooter className="pt-0">
+          <p className="text-sm text-muted-foreground">
+            Student projects in catalog
+          </p>
         </CardFooter>
       </Card>
       
-      <Card className="@container/card">
-        <CardHeader className="pb-2">
-          <CardDescription className="text-xs">Categories</CardDescription>
-          <CardTitle className="text-xl font-semibold tabular-nums @[250px]/card:text-2xl">
+      <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-chart-2/5 to-chart-2/10 dark:from-chart-2/10 dark:to-chart-2/20">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-chart-2/10 p-2">
+              <IconTag className="h-5 w-5 text-chart-2" />
+            </div>
+          </div>
+          <CardTitle className="text-3xl font-bold text-foreground">
             {stats.totalCategories.toLocaleString()}
           </CardTitle>
-          <CardAction>
-            <Badge variant="outline" className="text-xs">
-              <IconTag className="size-3" />
-              Active
-            </Badge>
-          </CardAction>
         </CardHeader>
-        <CardFooter className="flex-col items-start gap-1 text-xs pt-0">
-          <div className="line-clamp-1 flex gap-1 font-medium">
-            Project categories <IconTag className="size-3" />
-          </div>
+        <CardFooter className="pt-0">
+          <p className="text-sm text-muted-foreground">
+            Project categories available
+          </p>
         </CardFooter>
       </Card>
       
-      <Card className="@container/card">
-        <CardHeader className="pb-2">
-          <CardDescription className="text-xs">Tech Stacks</CardDescription>
-          <CardTitle className="text-xl font-semibold tabular-nums @[250px]/card:text-2xl">
+      <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-chart-3/5 to-chart-3/10 dark:from-chart-3/10 dark:to-chart-3/20">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-chart-3/10 p-2">
+              <IconStack className="h-5 w-5 text-chart-3" />
+            </div>
+          </div>
+          <CardTitle className="text-3xl font-bold text-foreground">
             {stats.totalTechstacks.toLocaleString()}
           </CardTitle>
-          <CardAction>
-            <Badge variant="outline" className="text-xs">
-              <IconStack className="size-3" />
-              Available
-            </Badge>
-          </CardAction>
         </CardHeader>
-        <CardFooter className="flex-col items-start gap-1 text-xs pt-0">
-          <div className="line-clamp-1 flex gap-1 font-medium">
-            Technology stacks <IconStack className="size-3" />
-          </div>
+        <CardFooter className="pt-0">
+          <p className="text-sm text-muted-foreground">
+            Technology stacks listed
+          </p>
         </CardFooter>
       </Card>
       
-      <Card className="@container/card">
-        <CardHeader className="pb-2">
-          <CardDescription className="text-xs">Skills</CardDescription>
-          <CardTitle className="text-xl font-semibold tabular-nums @[250px]/card:text-2xl">
+      <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-chart-4/5 to-chart-4/10 dark:from-chart-4/10 dark:to-chart-4/20">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-chart-4/10 p-2">
+              <IconCode className="h-5 w-5 text-chart-4" />
+            </div>
+          </div>
+          <CardTitle className="text-3xl font-bold text-foreground">
             {stats.totalSkills.toLocaleString()}
           </CardTitle>
-          <CardAction>
-            <Badge variant="outline" className="text-xs">
-              <IconCode className="size-3" />
-              Listed
-            </Badge>
-          </CardAction>
         </CardHeader>
-        <CardFooter className="flex-col items-start gap-1 text-xs pt-0">
-          <div className="line-clamp-1 flex gap-1 font-medium">
-            Available skills <IconCode className="size-3" />
-          </div>
+        <CardFooter className="pt-0">
+          <p className="text-sm text-muted-foreground">
+            Skills available to track
+          </p>
         </CardFooter>
       </Card>
       
-      <Card className="@container/card">
-        <CardHeader className="pb-2">
-          <CardDescription className="text-xs">Classes</CardDescription>
-          <CardTitle className="text-xl font-semibold tabular-nums @[250px]/card:text-2xl">
+      <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-chart-5/5 to-chart-5/10 dark:from-chart-5/10 dark:to-chart-5/20">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-chart-5/10 p-2">
+              <IconSchool className="h-5 w-5 text-chart-5" />
+            </div>
+          </div>
+          <CardTitle className="text-3xl font-bold text-foreground">
             {stats.totalClasses.toLocaleString()}
           </CardTitle>
-          <CardAction>
-            <Badge variant="outline" className="text-xs">
-              <IconSchool className="size-3" />
-              Active
-            </Badge>
-          </CardAction>
         </CardHeader>
-        <CardFooter className="flex-col items-start gap-1 text-xs pt-0">
-          <div className="line-clamp-1 flex gap-1 font-medium">
-            Student classes <IconSchool className="size-3" />
-          </div>
+        <CardFooter className="pt-0">
+          <p className="text-sm text-muted-foreground">
+            Student classes managed
+          </p>
         </CardFooter>
       </Card>
     </div>

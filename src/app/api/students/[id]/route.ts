@@ -1,0 +1,98 @@
+import { NextRequest, NextResponse } from "next/server"
+import { z } from "zod"
+import { getStudentById, updateStudent, deleteStudent } from "@/lib/students"
+
+const updateStudentSchema = z.object({
+  username: z.string().min(1).optional(),
+  email: z.string().email().optional(),
+  password: z.string().min(6).optional(),
+  fullName: z.string().min(1).optional(),
+  bio: z.string().optional(),
+  profilePhotoUrl: z.string().url().optional(),
+  githubUrl: z.string().url().optional(),
+  linkedinUrl: z.string().url().optional(),
+  classId: z.string().uuid().optional(),
+})
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const student = await getStudentById(params.id)
+    
+    if (!student) {
+      return NextResponse.json(
+        { error: "Student not found" },
+        { status: 404 }
+      )
+    }
+    
+    return NextResponse.json(student)
+  } catch (error) {
+    console.error("Error fetching student:", error)
+    return NextResponse.json(
+      { error: "Failed to fetch student" },
+      { status: 500 }
+    )
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const body = await request.json()
+    
+    const validatedData = updateStudentSchema.parse(body)
+    
+    const student = await updateStudent(params.id, validatedData)
+    
+    if (!student) {
+      return NextResponse.json(
+        { error: "Student not found" },
+        { status: 404 }
+      )
+    }
+    
+    return NextResponse.json(student)
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Validation failed", details: error.issues },
+        { status: 400 }
+      )
+    }
+    
+    console.error("Error updating student:", error)
+    return NextResponse.json(
+      { error: "Failed to update student" },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const success = await deleteStudent(params.id)
+    
+    if (!success) {
+      return NextResponse.json(
+        { error: "Student not found" },
+        { status: 404 }
+      )
+    }
+    
+    return NextResponse.json({ message: "Student deleted successfully" })
+  } catch (error) {
+    console.error("Error deleting student:", error)
+    return NextResponse.json(
+      { error: "Failed to delete student" },
+      { status: 500 }
+    )
+  }
+}

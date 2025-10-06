@@ -80,8 +80,8 @@ export function RecentProjectsTable({ projects }: RecentProjectsTableProps) {
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
                       <Badge variant="outline" className="text-xs">
-                        <IconEye className="size-3 mr-1" />
-                        {(project.viewsInternal + project.viewsExternal).toLocaleString()}
+                        <IconCalendar className="size-3 mr-1" />
+                        {new Date(project.createdAt).toLocaleDateString('id-ID')}
                       </Badge>
                     </div>
                   </TableCell>

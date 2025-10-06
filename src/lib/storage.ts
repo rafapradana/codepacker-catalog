@@ -162,7 +162,7 @@ export function validateFile(file: File, options: FileValidationOptions): FileVa
 }
 
 // Predefined validation options for different file types
-export const FILE_VALIDATION_OPTIONS = {
+export const FILE_VALIDATION_OPTIONS: Record<string, FileValidationOptions> = {
   PROFILE_PHOTO: {
     allowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
     maxSize: 5 * 1024 * 1024 // 5MB
