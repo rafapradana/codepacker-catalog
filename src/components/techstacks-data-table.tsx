@@ -33,7 +33,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { IconPlus, IconEdit, IconTrash, IconUpload, IconX } from "@tabler/icons-react"
 import { toast } from "sonner"
 import { TechStack } from "@/lib/techstacks"
@@ -262,15 +261,15 @@ export function TechStacksDataTable({ data: initialData }: TechStacksDataTablePr
   )
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Tech Stacks</CardTitle>
-            <CardDescription>
-              Manage tech stacks for your projects
-            </CardDescription>
-          </div>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Kelola Tech Stack</h2>
+          <p className="text-muted-foreground">
+            Kelola tech stack untuk project siswa
+          </p>
+        </div>
+        <div>
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
               <Button onClick={resetForm}>
@@ -373,9 +372,8 @@ export function TechStacksDataTable({ data: initialData }: TechStacksDataTablePr
             </DialogContent>
           </Dialog>
         </div>
-      </CardHeader>
-      <CardContent>
-        {data.length === 0 ? (
+      </div>
+      {data.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-muted-foreground">No tech stacks found.</p>
             <p className="text-sm text-muted-foreground mt-1">
@@ -569,7 +567,6 @@ export function TechStacksDataTable({ data: initialData }: TechStacksDataTablePr
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </CardContent>
-    </Card>
-  )
-}
+      </div>
+    )
+  }

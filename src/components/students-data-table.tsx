@@ -420,18 +420,15 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
   )
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <IconUser className="h-5 w-5" />
-              Kelola Siswa
-            </CardTitle>
-            <CardDescription>
-              Kelola data siswa, foto profil, dan skill yang dimiliki
-            </CardDescription>
-          </div>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Kelola Siswa</h2>
+          <p className="text-muted-foreground">
+            Kelola data siswa, foto profil, dan skill yang dimiliki
+          </p>
+        </div>
+        <div className="flex items-center space-x-2">
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
               <Button onClick={resetForm}>
@@ -655,8 +652,9 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
             </DialogContent>
           </Dialog>
         </div>
-      </CardHeader>
-      <CardContent>
+      </div>
+      
+      <div>
         {students.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             Belum ada data siswa. Klik "Tambah Siswa" untuk menambahkan siswa baru.
@@ -743,7 +741,7 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
             </TableBody>
           </Table>
         )}
-      </CardContent>
+      </div>
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
@@ -969,6 +967,6 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </Card>
+    </div>
   )
 }

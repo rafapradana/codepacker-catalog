@@ -7,16 +7,9 @@ export default function KelolaProjectPage() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="flex flex-col h-screen overflow-hidden">
         <SiteHeader />
-        <main className="@container/main flex flex-1 flex-col gap-6 p-6">
-          <div className="space-y-2">
-            <h1 className="text-2xl font-semibold tracking-tight">Kelola Project Siswa</h1>
-            <p className="text-sm text-muted-foreground">
-              Kelola data project siswa dengan lengkap
-            </p>
-          </div>
-          
+        <main className="@container/main flex flex-1 flex-col gap-6 p-6 overflow-y-auto">
           <ProjectsDataTable />
         </main>
       </SidebarInset>

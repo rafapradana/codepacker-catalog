@@ -161,67 +161,65 @@ export function ClassesDataTable({ data }: ClassesDataTableProps) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <IconSchool className="size-5" />
-              Daftar Kelas
-            </CardTitle>
-            <CardDescription>
-              Kelola data kelas siswa
-            </CardDescription>
-          </div>
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={() => setIsCreateDialogOpen(true)}>
-                <IconPlus className="size-4 mr-2" />
-                Tambah Kelas
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
-              <DialogHeader>
-                <DialogTitle>Tambah Kelas Baru</DialogTitle>
-                <DialogDescription>
-                  Masukkan nama kelas yang ingin ditambahkan.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Nama Kelas
-                  </Label>
-                  <Input
-                    id="name"
-                    value={className}
-                    onChange={(e) => setClassName(e.target.value)}
-                    className="col-span-3"
-                    placeholder="Contoh: XII RPL 1"
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={resetCreateDialog}>
-                  Batal
-                </Button>
-                <Button onClick={handleCreate} disabled={isLoading}>
-                  {isLoading ? "Menyimpan..." : "Simpan"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold tracking-tight flex items-center gap-2">
+            <IconSchool className="size-5" />
+            Daftar Kelas
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Kelola data kelas siswa
+          </p>
         </div>
-      </CardHeader>
-      <CardContent>
-        {classes.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            <IconSchool className="size-12 mx-auto mb-4 opacity-50" />
-            <p>Belum ada data kelas</p>
-            <p className="text-sm">Klik tombol "Tambah Kelas" untuk menambahkan kelas baru</p>
-          </div>
-        ) : (
-          <Table>
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <DialogTrigger asChild>
+            <Button onClick={() => setIsCreateDialogOpen(true)}>
+              <IconPlus className="size-4 mr-2" />
+              Tambah Kelas
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Tambah Kelas Baru</DialogTitle>
+              <DialogDescription>
+                Masukkan nama kelas yang ingin ditambahkan.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">
+                  Nama Kelas
+                </Label>
+                <Input
+                  id="name"
+                  value={className}
+                  onChange={(e) => setClassName(e.target.value)}
+                  className="col-span-3"
+                  placeholder="Contoh: XII RPL 1"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={resetCreateDialog}>
+                Batal
+              </Button>
+              <Button onClick={handleCreate} disabled={isLoading}>
+                {isLoading ? "Menyimpan..." : "Simpan"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+      
+      {classes.length === 0 ? (
+        <div className="text-center py-8 text-muted-foreground">
+          <IconSchool className="size-12 mx-auto mb-4 opacity-50" />
+          <p>Belum ada data kelas</p>
+          <p className="text-sm">Klik tombol "Tambah Kelas" untuk menambahkan kelas baru</p>
+        </div>
+      ) : (
+        <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Nama Kelas</TableHead>
@@ -283,7 +281,6 @@ export function ClassesDataTable({ data }: ClassesDataTableProps) {
             </TableBody>
           </Table>
         )}
-      </CardContent>
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
@@ -318,6 +315,6 @@ export function ClassesDataTable({ data }: ClassesDataTableProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </Card>
+    </div>
   )
 }

@@ -13,13 +13,6 @@ export default async function KelolaKelasPage() {
       <SidebarInset>
         <SiteHeader />
         <main className="@container/main flex flex-1 flex-col gap-6 p-6">
-          <div className="space-y-2">
-            <h1 className="text-2xl font-semibold tracking-tight">Kelola Kelas</h1>
-            <p className="text-sm text-muted-foreground">
-              Kelola data kelas siswa
-            </p>
-          </div>
-          
           <ClassesDataTable data={classes} />
         </main>
       </SidebarInset>

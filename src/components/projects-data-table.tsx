@@ -7,21 +7,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -55,6 +40,7 @@ import { ProjectWithDetails } from "@/lib/projects"
 import { Student } from "@/lib/students"
 import { Category } from "@/lib/categories"
 import { TechStack } from "@/lib/techstacks"
+import { ProjectCard } from "@/components/project-card"
 
 interface ProjectFormData {
   studentId: string
@@ -605,28 +591,27 @@ export function ProjectsDataTable() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Kelola Project Siswa</CardTitle>
-            <CardDescription>
-              Kelola data project siswa dengan lengkap
-            </CardDescription>
-          </div>
-          <Dialog open={isCreateDialogOpen} onOpenChange={(open) => {
-            console.log('Dialog state changing:', open)
-            setIsCreateDialogOpen(open)
-            if (open) {
-              resetForm()
-            }
-          }}>
-            <DialogTrigger asChild>
-              <Button onClick={() => console.log('Button clicked!')}>
-                <IconPlus className="mr-2 h-4 w-4" />
-                Tambah Project
-              </Button>
-            </DialogTrigger>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Kelola Project Siswa</h1>
+          <p className="text-muted-foreground">
+            Kelola data project siswa dengan lengkap
+          </p>
+        </div>
+        <Dialog open={isCreateDialogOpen} onOpenChange={(open) => {
+          console.log('Dialog state changing:', open)
+          setIsCreateDialogOpen(open)
+          if (open) {
+            resetForm()
+          }
+        }}>
+          <DialogTrigger asChild>
+            <Button onClick={() => console.log('Button clicked!')}>
+              <IconPlus className="mr-2 h-4 w-4" />
+              Tambah Project
+            </Button>
+          </DialogTrigger>
             <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-y-auto">
               <DialogHeader className="space-y-3 pb-6 border-b">
                 <DialogTitle className="text-xl font-semibold">Tambah Project Baru</DialogTitle>
@@ -946,136 +931,27 @@ export function ProjectsDataTable() {
             </DialogContent>
           </Dialog>
         </div>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Thumbnail</TableHead>
-              <TableHead>Project</TableHead>
-              <TableHead>Siswa</TableHead>
-              <TableHead>Kategori</TableHead>
-              <TableHead>Techstack</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {projects.map((project) => (
-              <TableRow key={project.id}>
-                <TableCell>
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage src={project.thumbnailUrl || undefined} alt={project.title} />
-                    <AvatarFallback>{project.title.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                </TableCell>
-                <TableCell>
-                  <div className="space-y-1">
-                    <div className="font-medium">{project.title}</div>
-                    {project.description && (
-                      <div className="text-sm text-muted-foreground line-clamp-2">
-                        {project.description}
-                      </div>
-                    )}
-                    <div className="flex gap-2">
-                      <Button variant="ghost" size="sm" asChild>
-                        <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                          <IconBrandGithub className="h-4 w-4" />
-                        </a>
-                      </Button>
-                      {project.liveDemoUrl && (
-                        <Button variant="ghost" size="sm" asChild>
-                          <a href={project.liveDemoUrl} target="_blank" rel="noopener noreferrer">
-                            <IconExternalLink className="h-4 w-4" />
-                          </a>
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src="" />
-                      <AvatarFallback>{project.student?.fullName?.charAt(0) || 'S'}</AvatarFallback>
-                    </Avatar>
-                    <span className="font-medium">{project.student?.fullName || 'Unknown'}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {project.category ? (
-                    <Badge variant="secondary">{project.category.name}</Badge>
-                  ) : (
-                    <span className="text-muted-foreground">-</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-wrap gap-1">
-                    {project.techstacks?.slice(0, 3).map((techstack) => (
-                      <Badge key={techstack.id} variant="outline" className="text-xs">
-                        {techstack.techstack?.name}
-                      </Badge>
-                    ))}
-                    {(project.techstacks?.length || 0) > 3 && (
-                      <Badge variant="outline" className="text-xs">
-                        +{(project.techstacks?.length || 0) - 3}
-                      </Badge>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleViewDetail(project)}
-                    >
-                      <IconEye className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEdit(project)}
-                    >
-                      <IconEdit className="h-4 w-4" />
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <IconTrash className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Hapus Project</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Apakah Anda yakin ingin menghapus project "{project.title}"? 
-                            Tindakan ini tidak dapat dibatalkan.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Batal</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDelete(project.id)}
-                            disabled={isLoading}
-                          >
-                            {isLoading ? "Menghapus..." : "Hapus"}
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
         
-        {projects.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
-            Belum ada data project
+        {/* Projects Grid Layout - 3 cards per row */}
+        {projects.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {projects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onView={handleViewDetail}
+                isLoading={isLoading}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 text-muted-foreground">
+            <div className="text-lg font-medium mb-2">Belum ada data project</div>
+            <p className="text-sm">Tambahkan project siswa untuk mulai mengelola data</p>
           </div>
         )}
-      </CardContent>
       
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
@@ -1541,6 +1417,6 @@ export function ProjectsDataTable() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </Card>
+    </div>
   )
 }

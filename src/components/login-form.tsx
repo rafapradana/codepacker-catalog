@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useTheme } from "next-themes"
+import Image from "next/image"
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -19,6 +21,7 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
+  const { theme } = useTheme()
   const router = useRouter()
   const [formData, setFormData] = useState<LoginFormData>({
     username: "",
@@ -89,9 +92,18 @@ export function LoginForm({
   return (
     <form className={cn("flex flex-col gap-6", className)} onSubmit={handleSubmit} {...props}>
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-2xl font-bold">Admin Login</h1>
+        <div className="mb-4">
+          <Image
+            src={theme === 'dark' ? '/images/logos/codepacker-white.svg' : '/images/logos/codepacker-black.svg'}
+            alt="CodePacker Catalog"
+            width={120}
+            height={40}
+            className="h-10 w-auto"
+          />
+        </div>
+        <h1 className="text-2xl font-bold">Login Admin</h1>
         <p className="text-muted-foreground text-sm text-balance">
-          Enter your credentials to access the CodePacker Catalog admin panel
+          Masukkan kredensial Anda untuk mengakses panel admin CodePacker Catalog
         </p>
       </div>
       
@@ -103,11 +115,11 @@ export function LoginForm({
 
       <div className="grid gap-6">
         <div className="grid gap-3">
-          <Label htmlFor="username">Username</Label>
+          <Label htmlFor="username">Nama Pengguna</Label>
           <Input 
             id="username" 
             type="text" 
-            placeholder="Enter your username"
+            placeholder="Masukkan nama pengguna Anda"
             value={formData.username}
             onChange={handleInputChange("username")}
             className={errors.username ? "border-destructive" : ""}
@@ -122,11 +134,11 @@ export function LoginForm({
         </div>
         
         <div className="grid gap-3">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">Kata Sandi</Label>
           <Input 
             id="password" 
             type="password"
-            placeholder="Enter your password"
+            placeholder="Masukkan kata sandi Anda"
             value={formData.password}
             onChange={handleInputChange("password")}
             className={errors.password ? "border-destructive" : ""}
@@ -141,7 +153,7 @@ export function LoginForm({
         </div>
         
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Signing in..." : "Sign In"}
+          {isLoading ? "Masuk..." : "Masuk"}
         </Button>
       </div>
     </form>

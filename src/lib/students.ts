@@ -145,6 +145,43 @@ export async function getStudentById(id: string): Promise<Student | null> {
   }
 }
 
+export async function getStudentByUserId(userId: string): Promise<Student | null> {
+  try {
+    const result = await db
+      .select({
+        id: students.id,
+        userId: students.userId,
+        fullName: students.fullName,
+        bio: students.bio,
+        profilePhotoUrl: students.profilePhotoUrl,
+        githubUrl: students.githubUrl,
+        linkedinUrl: students.linkedinUrl,
+        classId: students.classId,
+        createdAt: students.createdAt,
+        updatedAt: students.updatedAt,
+        user: {
+          id: users.id,
+          username: users.username,
+          email: users.email,
+          role: users.role,
+        },
+        class: {
+          id: classes.id,
+          name: classes.name,
+        },
+      })
+      .from(students)
+      .leftJoin(users, eq(students.userId, users.id))
+      .leftJoin(classes, eq(students.classId, classes.id))
+      .where(eq(students.userId, userId));
+    
+    return result[0] || null;
+  } catch (error) {
+    console.error('Error fetching student by user id:', error);
+    return null;
+  }
+}
+
 export async function createStudent(data: CreateStudentData): Promise<Student | null> {
   try {
     const result = await db.insert(students).values({

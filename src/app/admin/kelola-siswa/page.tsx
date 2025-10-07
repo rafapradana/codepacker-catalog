@@ -22,13 +22,6 @@ export default async function StudentManagementPage() {
       <SidebarInset>
         <SiteHeader />
         <main className="@container/main flex flex-1 flex-col gap-6 p-6">
-          <div className="space-y-2">
-            <h1 className="text-2xl font-semibold tracking-tight">Kelola Siswa</h1>
-            <p className="text-sm text-muted-foreground">
-              Kelola data siswa dan informasi terkait
-            </p>
-          </div>
-          
           <StudentsDataTable data={students} skills={skills} classes={classes} />
         </main>
       </SidebarInset>
