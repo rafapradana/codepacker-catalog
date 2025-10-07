@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { ModeToggle } from '@/components/mode-toggle'
 
 const menuItems = [
     { name: 'Siswa', href: '/siswa' },
@@ -80,6 +81,7 @@ export const GuestNavbar = ({ className }: GuestNavbarProps) => {
                                 </ul>
                             </div>
                             <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
+                                <ModeToggle />
                                 <Button
                                     asChild
                                     variant="outline"
