@@ -51,9 +51,9 @@ export function ProjectCard({ project, onEdit, onDelete, onView, isLoading = fal
             variant="secondary" 
             className="absolute top-2 left-2 text-xs shadow-sm"
             style={{
-              backgroundColor: project.category.bgHex,
-              borderColor: project.category.borderHex,
-              color: project.category.textHex,
+              backgroundColor: project.category.bgHex || undefined,
+              borderColor: project.category.borderHex || undefined,
+              color: project.category.textHex || undefined,
             }}
           >
             {project.category.name}
@@ -85,9 +85,9 @@ export function ProjectCard({ project, onEdit, onDelete, onView, isLoading = fal
         </div>
 
         {/* Tech Stacks */}
-        {project.projectTechstacks && project.projectTechstacks.length > 0 && (
+        {project.techstacks && project.techstacks.length > 0 && (
           <div className="flex flex-wrap gap-1">
-            {project.projectTechstacks.slice(0, 3).map((pt) => (
+            {project.techstacks.slice(0, 3).map((pt) => (
               pt.techstack && (
                 <Badge
                   key={pt.id}
@@ -103,9 +103,9 @@ export function ProjectCard({ project, onEdit, onDelete, onView, isLoading = fal
                 </Badge>
               )
             ))}
-            {project.projectTechstacks.length > 3 && (
+            {project.techstacks.length > 3 && (
               <Badge variant="outline" className="text-xs px-2 py-0.5">
-                +{project.projectTechstacks.length - 3}
+                +{project.techstacks.length - 3}
               </Badge>
             )}
           </div>

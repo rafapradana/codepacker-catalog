@@ -29,24 +29,29 @@ const data = {
   },
   navMain: [
     {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: IconDashboard,
-    },
-    {
-      title: "Profile",
-      url: "/dashboard/profile",
-      icon: IconUser,
-    },
-    {
-      title: "My Projects",
-      url: "/dashboard/projects",
-      icon: IconFolder,
-    },
-    {
-      title: "Settings",
-      url: "/dashboard/settings",
-      icon: IconSettings,
+      title: "Navigation",
+      items: [
+        {
+          title: "Dashboard",
+          url: "/dashboard",
+          icon: IconDashboard,
+        },
+        {
+          title: "Profile",
+          url: "/dashboard/profile",
+          icon: IconUser,
+        },
+        {
+          title: "My Projects",
+          url: "/dashboard/projects",
+          icon: IconFolder,
+        },
+        {
+          title: "Settings",
+          url: "/dashboard/settings",
+          icon: IconSettings,
+        },
+      ],
     },
   ],
 }
@@ -85,7 +90,7 @@ export function StudentSidebar({ ...props }: React.ComponentProps<typeof Sidebar
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain groups={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

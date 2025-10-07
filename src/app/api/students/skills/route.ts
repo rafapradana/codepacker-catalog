@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     const student = await getStudentByUserId(userId)
+    
     if (!student) {
       return NextResponse.json(
         { error: "Student not found" },
@@ -71,24 +72,18 @@ export async function POST(request: NextRequest) {
     if (!result.success) {
       return NextResponse.json(
         { error: result.error },
-        { status: 400 }
+        { status: result.error === "Student not found" || result.error === "Skill not found" ? 404 : 400 }
       )
     }
-
-    const skills = await getStudentSkills(student.id)
     
-    return NextResponse.json({ 
-      message: "Skill added successfully",
-      skills 
-    })
+    return NextResponse.json(result.data, { status: 201 })
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation failed", details: error.issues },
+        { error: "Invalid data", details: error.issues },
         { status: 400 }
       )
     }
-    
     console.error("Error adding student skill:", error)
     return NextResponse.json(
       { error: "Failed to add skill" },
@@ -111,6 +106,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const student = await getStudentByUserId(userId)
+    
     if (!student) {
       return NextResponse.json(
         { error: "Student not found" },
@@ -125,24 +121,18 @@ export async function DELETE(request: NextRequest) {
     if (!result.success) {
       return NextResponse.json(
         { error: result.error },
-        { status: 400 }
+        { status: result.error === "Student not found" || result.error === "Skill not found" ? 404 : 400 }
       )
     }
-
-    const skills = await getStudentSkills(student.id)
     
-    return NextResponse.json({ 
-      message: "Skill removed successfully",
-      skills 
-    })
+    return NextResponse.json({ message: "Skill removed successfully" })
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation failed", details: error.issues },
+        { error: "Invalid data", details: error.issues },
         { status: 400 }
       )
     }
-    
     console.error("Error removing student skill:", error)
     return NextResponse.json(
       { error: "Failed to remove skill" },
