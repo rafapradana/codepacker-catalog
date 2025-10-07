@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Github, Linkedin, Mail, MapPin, Phone } from "lucide-react";
+import { Github, Instagram, Mail } from "lucide-react";
 
 interface FooterProps {
   className?: string;
@@ -7,112 +7,112 @@ interface FooterProps {
 
 export function Footer({ className = "" }: FooterProps) {
   return (
-    <footer className={`bg-gray-900 text-white ${className}`}>
-      <div className="container mx-auto px-4 py-12">
+    <footer className={`bg-gray-50 border-t border-gray-200 ${className}`}>
+      <div className="container mx-auto px-6 md:px-12 lg:px-20 py-12">
         <div className="grid md:grid-cols-4 gap-8">
           {/* Brand */}
-          <div className="col-span-2">
+          <div>
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">CP</span>
               </div>
-              <span className="text-xl font-bold">CodePacker Catalog</span>
+              <span className="text-xl font-bold font-poppins text-blue-600">Codepacker</span>
             </div>
-            <p className="text-gray-400 mb-6 max-w-md leading-relaxed">
-              Platform showcase portofolio siswa RPL SMKN 4 Malang. 
-              Menampilkan karya terbaik dari generasi muda developer Indonesia.
+            <p className="text-gray-600 text-sm font-inter leading-relaxed">
+              Platform modern untuk menampilkan katalog dan portofolio siswa RPL SMKN 4 Malang.
             </p>
-            <div className="flex items-center space-x-4">
-              <Link 
-                href="https://github.com/rafapradana/codepacker-catalog" 
-                target="_blank"
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                <Github className="w-5 h-5" />
-              </Link>
-              <Link 
-                href="#" 
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                <Linkedin className="w-5 h-5" />
-              </Link>
-              <Link 
-                href="mailto:info@smkn4malang.sch.id" 
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                <Mail className="w-5 h-5" />
-              </Link>
-            </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Navigasi */}
           <div>
-            <h3 className="font-semibold mb-4 text-lg">Quick Links</h3>
-            <ul className="space-y-3">
+            <h3 className="font-semibold mb-4 text-base font-poppins text-gray-900">Navigasi</h3>
+            <ul className="space-y-2">
               <li>
-                <Link href="/students" className="text-gray-400 hover:text-white transition-colors">
-                  Students
+                <Link href="/" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-inter">
+                  Beranda
                 </Link>
               </li>
               <li>
-                <Link href="/projects" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/students" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-inter">
+                  Siswa
+                </Link>
+              </li>
+              <li>
+                <Link href="/projects" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-inter">
                   Projects
                 </Link>
               </li>
+            </ul>
+          </div>
+
+          {/* Kategori */}
+          <div>
+            <h3 className="font-semibold mb-4 text-base font-poppins text-gray-900">Kategori</h3>
+            <ul className="space-y-2">
               <li>
-                <Link href="/about" className="text-gray-400 hover:text-white transition-colors">
-                  About
+                <Link href="/projects?category=web" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-inter">
+                  Web Development
                 </Link>
               </li>
               <li>
-                <Link href="/login" className="text-gray-400 hover:text-white transition-colors">
-                  Login
+                <Link href="/projects?category=mobile" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-inter">
+                  Mobile Development
+                </Link>
+              </li>
+              <li>
+                <Link href="/projects?category=game" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-inter">
+                  Game Development
+                </Link>
+              </li>
+              <li>
+                <Link href="/projects?category=desktop" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-inter">
+                  Desktop Application
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Kontak */}
           <div>
-            <h3 className="font-semibold mb-4 text-lg">Contact</h3>
-            <ul className="space-y-3">
-              <li className="flex items-start space-x-2">
-                <MapPin className="w-4 h-4 mt-1 text-gray-400 flex-shrink-0" />
-                <div className="text-gray-400">
-                  <div>SMKN 4 Malang</div>
-                  <div>Jl. Tanimbar No.22, Malang</div>
-                </div>
-              </li>
-              <li className="flex items-center space-x-2">
-                <Mail className="w-4 h-4 text-gray-400" />
+            <h3 className="font-semibold mb-4 text-base font-poppins text-gray-900">Kontak</h3>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <Mail className="w-4 h-4 text-gray-600" />
                 <Link 
                   href="mailto:info@smkn4malang.sch.id"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-inter"
                 >
                   info@smkn4malang.sch.id
                 </Link>
-              </li>
-              <li className="flex items-center space-x-2">
-                <Phone className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-400">(0341) 123456</span>
-              </li>
-            </ul>
+              </div>
+              <div className="flex items-center space-x-3 mt-4">
+                <Link 
+                  href="https://github.com/rafapradana/codepacker-catalog" 
+                  target="_blank"
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                >
+                  <Github className="w-5 h-5" />
+                </Link>
+                <Link 
+                  href="https://instagram.com" 
+                  target="_blank"
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                >
+                  <Instagram className="w-5 h-5" />
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Bottom */}
-        <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm">
-            &copy; 2024 CodePacker Catalog. All rights reserved.
+        <div className="border-t border-gray-200 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-gray-600 text-sm font-inter">
+            © 2024 SMKN 4 Malang. All rights reserved.
           </p>
-          <div className="flex items-center space-x-6 mt-4 md:mt-0">
-            <Link href="/privacy" className="text-gray-400 hover:text-white text-sm transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">
-              Terms of Service
-            </Link>
-          </div>
+          <p className="text-gray-600 text-sm font-inter mt-2 md:mt-0">
+            Made with <span className="text-red-500">❤️</span> by RPL Students
+          </p>
         </div>
       </div>
     </footer>

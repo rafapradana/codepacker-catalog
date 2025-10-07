@@ -21,7 +21,7 @@ export function TopProjectsSection({ className = "" }: TopProjectsSectionProps) 
       techStack: ["Python", "TensorFlow", "Django", "+2"],
       author: {
         name: "Fatimah Zahra",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Fatimah",
+        avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop",
         date: "20 Februari 2024"
       }
     },
@@ -36,7 +36,7 @@ export function TopProjectsSection({ className = "" }: TopProjectsSectionProps) 
       techStack: ["React", "TypeScript", "Node.js", "+2"],
       author: {
         name: "Ahmad Rizki Pratama",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmad",
+        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
         date: "16 Januari 2024"
       }
     },
@@ -51,7 +51,7 @@ export function TopProjectsSection({ className = "" }: TopProjectsSectionProps) 
       techStack: ["Unity", "C#", "Photoshop"],
       author: {
         name: "Eko Prasetyo",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Eko",
+        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
         date: "10 Februari 2024"
       }
     }
@@ -119,7 +119,7 @@ export function TopProjectsSection({ className = "" }: TopProjectsSectionProps) 
                       {project.techStack.map((tech, index) => (
                         <span
                           key={index}
-                          className="px-2 py-0.5 bg-gray-100 text-gray-700 text-[11px] rounded-md font-medium"
+                          className="px-2 py-1 bg-blue-50 text-blue-700 text-[11px] rounded-lg font-medium border border-blue-100"
                         >
                           {tech}
                         </span>
