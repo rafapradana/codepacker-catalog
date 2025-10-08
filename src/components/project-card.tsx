@@ -72,6 +72,7 @@ interface PublicProjectCardProps {
       mediaType: string
     }>
   }
+  hideStudentInfo?: boolean // New prop to hide student info on profile pages
 }
 
 type ProjectCardProps = AdminProjectCardProps | PublicProjectCardProps
@@ -306,6 +307,7 @@ export function ProjectCard(props: ProjectCardProps) {
   }
   
   // Public version for projects page
+  const { hideStudentInfo = false } = props
   return (
     <Card className="group relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 border-border/50 h-full flex flex-col py-0">
       {/* Thumbnail Section */}
@@ -359,8 +361,8 @@ export function ProjectCard(props: ProjectCardProps) {
           )}
         </div>
 
-        {/* Student Info */}
-        {project.student && (
+        {/* Student Info - Hidden when hideStudentInfo is true */}
+        {project.student && !hideStudentInfo && (
           <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-muted/30 border border-border/30">
             <Avatar className="h-7 w-7 border-2 border-background shadow-sm">
               <AvatarImage src={project.student.profilePhotoUrl || undefined} />
@@ -381,40 +383,6 @@ export function ProjectCard(props: ProjectCardProps) {
           </div>
         )}
 
-        {/* Tech Stacks */}
-        {('projectTechstacks' in project ? project.projectTechstacks : project.techstacks) && 
-         ('projectTechstacks' in project ? project.projectTechstacks : project.techstacks).length > 0 && (
-          <div className="space-y-1.5 flex-1">
-            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              Tech Stack
-            </h4>
-            <div className="flex flex-wrap gap-1">
-              {('projectTechstacks' in project ? project.projectTechstacks : project.techstacks)
-                .slice(0, 5)
-                .filter((pt: any) => pt.techstack)
-                .map((pt: any, index: number) => (
-                  <Badge
-                    key={`${pt.id || pt.techstack?.id || index}-${pt.techstack?.name || index}`}
-                    variant="outline"
-                    className="text-xs font-medium px-2 py-0.5 border-border/60 hover:bg-muted/50 transition-colors"
-                    style={{
-                      backgroundColor: pt.techstack.bgHex || undefined,
-                      borderColor: pt.techstack.borderHex || undefined,
-                      color: pt.techstack.textHex || undefined,
-                    }}
-                  >
-                    {pt.techstack.name}
-                  </Badge>
-                ))}
-              {('projectTechstacks' in project ? project.projectTechstacks : project.techstacks).length > 5 && (
-                <Badge variant="outline" className="text-xs font-medium px-2 py-0.5 text-muted-foreground border-border/60">
-                  +{('projectTechstacks' in project ? project.projectTechstacks : project.techstacks).length - 5}
-                </Badge>
-              )}
-            </div>
-          </div>
-        )}
-
         {/* Date & Actions */}
         <div className="space-y-2.5 mt-auto pt-2.5 border-t border-border/30">
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -428,41 +396,13 @@ export function ProjectCard(props: ProjectCardProps) {
             </span>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-1.5">
-            {project.githubUrl && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-7 w-7 p-0 hover:bg-muted/80 transition-colors"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  window.open(project.githubUrl, '_blank')
-                }}
-              >
-                <IconBrandGithub className="h-3 w-3" />
-              </Button>
-            )}
-            {project.liveDemoUrl && (
-               <Button
-                 variant="outline"
-                 size="sm"
-                 className="h-7 w-7 p-0 hover:bg-muted/80 transition-colors"
-                 onClick={(e) => {
-                   e.stopPropagation()
-                   window.open(project.liveDemoUrl!, '_blank')
-                 }}
-               >
-                 <IconExternalLink className="h-3 w-3" />
-               </Button>
-             )}
-            <Link href={`/projects/${project.id}`} className="ml-auto">
-              <Button variant="default" size="sm" className="h-7 px-3 text-xs font-medium">
-                <IconEye className="h-3 w-3 mr-1" />
-                View Details
-              </Button>
-            </Link>
-          </div>
+          {/* Action Button - Full width "Lihat Detail" */}
+          <Link href={`/projects/${project.id}`} className="block w-full">
+            <Button variant="default" size="sm" className="w-full h-8 text-xs font-medium">
+              <IconEye className="h-3 w-3 mr-1" />
+              Lihat Detail
+            </Button>
+          </Link>
         </div>
       </CardContent>
     </Card>

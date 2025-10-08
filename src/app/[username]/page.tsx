@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { Github, Linkedin, MapPin, Calendar, Mail } from 'lucide-react'
+import { Github, Linkedin, Calendar,MapPin } from 'lucide-react'
 import { ProjectCard } from '@/components/project-card'
 import { GuestNavbar } from '@/components/guest-navbar'
 
@@ -118,11 +118,6 @@ export default function StudentProfilePage() {
     )
   }
 
-  const joinDate = new Date(student.createdAt).toLocaleDateString('id-ID', {
-    year: 'numeric',
-    month: 'long'
-  })
-
   return (
     <>
       <GuestNavbar />
@@ -196,43 +191,35 @@ export default function StudentProfilePage() {
                       <span>{student.class.name}</span>
                     </div>
                   )}
-                  <div className="flex items-center justify-center sm:justify-start gap-1">
-                    <Calendar className="w-4 h-4" />
-                    <span>Bergabung {joinDate}</span>
-                  </div>
-                  <div className="flex items-center justify-center sm:justify-start gap-1">
-                    <Mail className="w-4 h-4" />
-                    <span>{student.user.email}</span>
-                  </div>
+                  
+                  {/* Skills Section - Moved here */}
+                  {student.studentSkills.length > 0 && (
+                    <div className="mt-2">
+                      <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+                        {student.studentSkills.map(({ skill }) => (
+                          <Badge
+                            key={skill.id}
+                            variant="secondary"
+                            className="px-3 py-1.5 text-xs font-medium"
+                            style={{
+                              backgroundColor: skill.bgHex || undefined,
+                              borderColor: skill.borderHex || undefined,
+                              color: skill.textHex || undefined,
+                            }}
+                          >
+                            {skill.iconUrl && (
+                              <img src={skill.iconUrl} alt={skill.name} className="w-3 h-3 mr-1.5" />
+                            )}
+                            {skill.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
-
-          {/* Skills Section */}
-          {student.studentSkills.length > 0 && (
-            <div className="mb-8">
-              <div className="flex flex-wrap justify-center sm:justify-start gap-2">
-                {student.studentSkills.map(({ skill }) => (
-                  <Badge
-                    key={skill.id}
-                    variant="secondary"
-                    className="px-3 py-1.5 text-xs font-medium"
-                    style={{
-                      backgroundColor: skill.bgHex || undefined,
-                      borderColor: skill.borderHex || undefined,
-                      color: skill.textHex || undefined,
-                    }}
-                  >
-                    {skill.iconUrl && (
-                      <img src={skill.iconUrl} alt={skill.name} className="w-3 h-3 mr-1.5" />
-                    )}
-                    {skill.name}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* Separator - Instagram Style */}
           <div className="border-t border-border mb-8"></div>
@@ -281,6 +268,7 @@ export default function StudentProfilePage() {
                       },
                       projectMedia: [], // Empty array since API doesn't return projectMedia
                     }}
+                    hideStudentInfo={true} // Hide student info on their own profile page
                   />
                 ))}
               </div>
