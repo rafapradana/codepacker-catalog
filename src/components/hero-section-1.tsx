@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { AnimatedGroup } from '@/components/ui/animated-group'
 import { cn } from '@/lib/utils'
 import { ModeToggle } from '@/components/mode-toggle'
+import { isStudentLoggedIn, getStudentInfo } from '@/lib/session'
 
 
 const transitionVariants = {
@@ -199,6 +200,8 @@ const menuItems = [
 const HeroHeader = () => {
     const [menuState, setMenuState] = React.useState(false)
     const [isScrolled, setIsScrolled] = React.useState(false)
+    const [studentLoggedIn, setStudentLoggedIn] = React.useState(false)
+    const [studentInfo, setStudentInfo] = React.useState<{ name: string; email: string } | null>(null)
 
     React.useEffect(() => {
         const handleScroll = () => {
@@ -207,6 +210,64 @@ const HeroHeader = () => {
         window.addEventListener('scroll', handleScroll)
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
+
+    React.useEffect(() => {
+        // Check student login status on component mount and when localStorage changes
+        const checkLoginStatus = () => {
+            console.log('=== HeroHeader: Checking login status ===')
+            const loggedIn = isStudentLoggedIn()
+            console.log('HeroHeader: isStudentLoggedIn result:', loggedIn)
+            console.log('HeroHeader: Current studentLoggedIn state before update:', studentLoggedIn)
+            setStudentLoggedIn(loggedIn)
+            if (loggedIn) {
+                const info = getStudentInfo()
+                console.log('HeroHeader: Student info:', info)
+                setStudentInfo(info)
+            } else {
+                setStudentInfo(null)
+            }
+            console.log('HeroHeader: State updated - studentLoggedIn:', loggedIn)
+            // Force a re-render by updating state in next tick
+            setTimeout(() => {
+                console.log('HeroHeader: Forcing re-render check, current state:', studentLoggedIn)
+            }, 0)
+        }
+
+        // Initial check
+        console.log('HeroHeader: Running initial login check')
+        checkLoginStatus()
+
+        // Listen for storage changes (when user logs in/out in another tab)
+        const handleStorageChange = (e: StorageEvent) => {
+            if (e.key === 'codepacker_student_session') {
+                console.log('HeroHeader: Storage changed, rechecking login status')
+                checkLoginStatus()
+            }
+        }
+
+        // Listen for custom events (when user logs in/out in same tab)
+        const handleCustomEvent = () => {
+            console.log('HeroHeader: Custom login event received, rechecking login status')
+            checkLoginStatus()
+        }
+
+        window.addEventListener('storage', handleStorageChange)
+        window.addEventListener('studentLoginChanged', handleCustomEvent)
+        return () => {
+            window.removeEventListener('storage', handleStorageChange)
+            window.removeEventListener('studentLoginChanged', handleCustomEvent)
+        }
+    }, [])
+
+    // Add effect to log state changes
+    React.useEffect(() => {
+        console.log('HeroHeader: studentLoggedIn state changed to:', studentLoggedIn)
+        console.log('HeroHeader: studentInfo state:', studentInfo)
+    }, [studentLoggedIn, studentInfo])
+    
+    // Debug log during render
+    console.log('HeroHeader RENDER: studentLoggedIn =', studentLoggedIn, 'studentInfo =', studentInfo)
+    
     return (
         <header>
             <nav
@@ -261,23 +322,49 @@ const HeroHeader = () => {
                             </div>
                             <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
                                 <ModeToggle />
-                                <Button
-                                    asChild
-                                    variant="outline"
-                                    size="sm"
-                                    className={cn(isScrolled && 'lg:hidden')}>
-                                    <Link href="/login">
-                                        <span>Login</span>
-                                    </Link>
-                                </Button>
-                                <Button
-                                    asChild
-                                    size="sm"
-                                    className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
-                                    <Link href="/login">
-                                        <span>Login</span>
-                                    </Link>
-                                </Button>
+                                {studentLoggedIn ? (
+                                    // Show "Masuk ke App" button for logged-in students
+                                    <>
+                                        <Button
+                                            asChild
+                                            variant="outline"
+                                            size="sm"
+                                            className={cn(isScrolled && 'lg:hidden')}>
+                                            <Link href="/app">
+                                                <span>Masuk ke App</span>
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            asChild
+                                            size="sm"
+                                            className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
+                                            <Link href="/app">
+                                                <span>Masuk ke App</span>
+                                            </Link>
+                                        </Button>
+                                    </>
+                                ) : (
+                                    // Show "Login" button for non-logged-in users
+                                    <>
+                                        <Button
+                                            asChild
+                                            variant="outline"
+                                            size="sm"
+                                            className={cn(isScrolled && 'lg:hidden')}>
+                                            <Link href="/login">
+                                                <span>Login</span>
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            asChild
+                                            size="sm"
+                                            className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
+                                            <Link href="/login">
+                                                <span>Login</span>
+                                            </Link>
+                                        </Button>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>

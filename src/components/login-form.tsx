@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useTheme } from "next-themes"
 import Image from "next/image"
+import { saveStudentSession } from "@/lib/session"
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -70,24 +71,45 @@ export function LoginForm({
     }
 
     try {
-      const response = await fetch('/api/auth/login', {
+      // Use different endpoints based on user type
+      const endpoint = userType === "admin" ? '/api/auth/login' : '/api/auth/student-login'
+      
+      // For student login, send email instead of username
+      const loginData = userType === "student" 
+        ? { email: validationResult.data.username, password: validationResult.data.password }
+        : validationResult.data
+      
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(validationResult.data),
+        body: JSON.stringify(loginData),
       })
 
       const result = await response.json()
 
-      if (result.success) {
-        // Redirect to admin dashboard
-    if (userType === "admin") {
-      router.push('/admin/dashboard')
-    } else {
-      // Redirect to student app
-      router.push('/app')
-    }
+      if (response.ok && (result.success || result.message)) {
+        // Save session data for students only
+        if (userType === "student" && result.user) {
+          const sessionData = {
+            id: result.user.id,
+            email: result.user.email,
+            name: result.user.name,
+            studentId: result.user.studentId || '',
+            className: result.user.className || '',
+            loginTime: new Date().toISOString()
+          }
+          saveStudentSession(sessionData)
+        }
+        
+        // Redirect based on user type
+        if (userType === "admin") {
+          router.push('/admin/dashboard')
+        } else {
+          // Redirect to student app
+          router.push('/app')
+        }
       } else {
         setLoginError(result.error || 'Login failed')
       }
@@ -130,11 +152,13 @@ export function LoginForm({
 
       <div className="grid gap-6">
         <div className="grid gap-3">
-          <Label htmlFor="username">Nama Pengguna</Label>
+          <Label htmlFor="username">
+            {userType === "admin" ? "Nama Pengguna" : "Email"}
+          </Label>
           <Input 
             id="username" 
-            type="text" 
-            placeholder="Masukkan nama pengguna Anda"
+            type={userType === "admin" ? "text" : "email"}
+            placeholder={userType === "admin" ? "Masukkan nama pengguna Anda" : "Masukkan email Anda"}
             value={formData.username}
             onChange={handleInputChange("username")}
             className={errors.username ? "border-destructive" : ""}

@@ -6,6 +6,7 @@ import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { ModeToggle } from '@/components/mode-toggle'
+import { isStudentLoggedIn, getStudentInfo } from '@/lib/session'
 
 const menuItems = [
     { name: 'Siswa', href: '/siswa' },
@@ -19,6 +20,12 @@ interface GuestNavbarProps {
 export const GuestNavbar = ({ className }: GuestNavbarProps) => {
     const [menuState, setMenuState] = React.useState(false)
     const [isScrolled, setIsScrolled] = React.useState(false)
+    const [studentLoggedIn, setStudentLoggedIn] = React.useState(false)
+    const [studentInfo, setStudentInfo] = React.useState<{ name: string; email: string } | null>(null)
+    
+    console.log('=== GuestNavbar Component Render ===')
+    console.log('Current studentLoggedIn state:', studentLoggedIn)
+    console.log('Current studentInfo state:', studentInfo)
 
     React.useEffect(() => {
         const handleScroll = () => {
@@ -26,6 +33,39 @@ export const GuestNavbar = ({ className }: GuestNavbarProps) => {
         }
         window.addEventListener('scroll', handleScroll)
         return () => window.removeEventListener('scroll', handleScroll)
+    }, [])
+
+    React.useEffect(() => {
+        // Check student login status on component mount and when localStorage changes
+        const checkLoginStatus = () => {
+            console.log('=== Navbar: Checking login status ===')
+            const loggedIn = isStudentLoggedIn()
+            console.log('Navbar: isStudentLoggedIn result:', loggedIn)
+            setStudentLoggedIn(loggedIn)
+            if (loggedIn) {
+                const info = getStudentInfo()
+                console.log('Navbar: Student info:', info)
+                setStudentInfo(info)
+            } else {
+                setStudentInfo(null)
+            }
+            console.log('Navbar: State updated - studentLoggedIn:', loggedIn)
+        }
+
+        // Initial check
+        console.log('Navbar: Running initial login check')
+        checkLoginStatus()
+
+        // Listen for storage changes (when user logs in/out in another tab)
+        const handleStorageChange = (e: StorageEvent) => {
+            if (e.key === 'codepacker_student_session') {
+                console.log('Navbar: Storage changed, rechecking login status')
+                checkLoginStatus()
+            }
+        }
+
+        window.addEventListener('storage', handleStorageChange)
+        return () => window.removeEventListener('storage', handleStorageChange)
     }, [])
 
     return (
@@ -82,23 +122,49 @@ export const GuestNavbar = ({ className }: GuestNavbarProps) => {
                             </div>
                             <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
                                 <ModeToggle />
-                                <Button
-                                    asChild
-                                    variant="outline"
-                                    size="sm"
-                                    className={cn(isScrolled && 'lg:hidden')}>
-                                    <Link href="/login">
-                                        <span>Login</span>
-                                    </Link>
-                                </Button>
-                                <Button
-                                    asChild
-                                    size="sm"
-                                    className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
-                                    <Link href="/login">
-                                        <span>Login</span>
-                                    </Link>
-                                </Button>
+                                {studentLoggedIn ? (
+                                    // Show "Masuk ke App" button for logged-in students
+                                    <>
+                                        <Button
+                                            asChild
+                                            variant="outline"
+                                            size="sm"
+                                            className={cn(isScrolled && 'lg:hidden')}>
+                                            <Link href="/app">
+                                                <span>Masuk ke App</span>
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            asChild
+                                            size="sm"
+                                            className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
+                                            <Link href="/app">
+                                                <span>Masuk ke App</span>
+                                            </Link>
+                                        </Button>
+                                    </>
+                                ) : (
+                                    // Show "Login" button for non-logged-in users
+                                    <>
+                                        <Button
+                                            asChild
+                                            variant="outline"
+                                            size="sm"
+                                            className={cn(isScrolled && 'lg:hidden')}>
+                                            <Link href="/login">
+                                                <span>Login</span>
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            asChild
+                                            size="sm"
+                                            className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
+                                            <Link href="/login">
+                                                <span>Login</span>
+                                            </Link>
+                                        </Button>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
