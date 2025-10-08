@@ -20,33 +20,33 @@ async function seed() {
     const categoriesData = await db.insert(categories).values([
       {
         name: 'Web Application',
-        bgHex: '#3B82F6',
-        borderHex: '#2563EB',
-        textHex: '#FFFFFF'
+        bg_hex: '#3B82F6',
+        border_hex: '#2563EB',
+        text_hex: '#FFFFFF'
       },
       {
         name: 'Mobile Application',
-        bgHex: '#10B981',
-        borderHex: '#059669',
-        textHex: '#FFFFFF'
+        bg_hex: '#10B981',
+        border_hex: '#059669',
+        text_hex: '#FFFFFF'
       },
       {
         name: 'Desktop Application',
-        bgHex: '#8B5CF6',
-        borderHex: '#7C3AED',
-        textHex: '#FFFFFF'
+        bg_hex: '#8B5CF6',
+        border_hex: '#7C3AED',
+        text_hex: '#FFFFFF'
       },
       {
         name: 'Game',
-        bgHex: '#F59E0B',
-        borderHex: '#D97706',
-        textHex: '#FFFFFF'
+        bg_hex: '#F59E0B',
+        border_hex: '#D97706',
+        text_hex: '#FFFFFF'
       },
       {
         name: 'CLI Tool',
-        bgHex: '#6B7280',
-        borderHex: '#4B5563',
-        textHex: '#FFFFFF'
+        bg_hex: '#6B7280',
+        border_hex: '#4B5563',
+        text_hex: '#FFFFFF'
       }
     ]).returning();
 
@@ -55,51 +55,51 @@ async function seed() {
     const skillsData = await db.insert(skills).values([
       {
         name: 'JavaScript',
-        bgHex: '#F7DF1E',
-        borderHex: '#F7DF1E',
-        textHex: '#000000'
+        bg_hex: '#F7DF1E',
+        border_hex: '#F7DF1E',
+        text_hex: '#000000'
       },
       {
         name: 'TypeScript',
-        bgHex: '#3178C6',
-        borderHex: '#3178C6',
-        textHex: '#FFFFFF'
+        bg_hex: '#3178C6',
+        border_hex: '#3178C6',
+        text_hex: '#FFFFFF'
       },
       {
         name: 'React',
-        bgHex: '#61DAFB',
-        borderHex: '#61DAFB',
-        textHex: '#000000'
+        bg_hex: '#61DAFB',
+        border_hex: '#61DAFB',
+        text_hex: '#000000'
       },
       {
         name: 'Node.js',
-        bgHex: '#339933',
-        borderHex: '#339933',
-        textHex: '#FFFFFF'
+        bg_hex: '#339933',
+        border_hex: '#339933',
+        text_hex: '#FFFFFF'
       },
       {
         name: 'Python',
-        bgHex: '#3776AB',
-        borderHex: '#3776AB',
-        textHex: '#FFFFFF'
+        bg_hex: '#3776AB',
+        border_hex: '#3776AB',
+        text_hex: '#FFFFFF'
       },
       {
         name: 'PHP',
-        bgHex: '#777BB4',
-        borderHex: '#777BB4',
-        textHex: '#FFFFFF'
+        bg_hex: '#777BB4',
+        border_hex: '#777BB4',
+        text_hex: '#FFFFFF'
       },
       {
         name: 'Java',
-        bgHex: '#ED8B00',
-        borderHex: '#ED8B00',
-        textHex: '#FFFFFF'
+        bg_hex: '#ED8B00',
+        border_hex: '#ED8B00',
+        text_hex: '#FFFFFF'
       },
       {
         name: 'UI/UX Design',
-        bgHex: '#FF5722',
-        borderHex: '#FF5722',
-        textHex: '#FFFFFF'
+        bg_hex: '#FF5722',
+        border_hex: '#FF5722',
+        text_hex: '#FFFFFF'
       }
     ]).returning();
 
@@ -108,63 +108,63 @@ async function seed() {
     const techstacksData = await db.insert(techstacks).values([
       {
         name: 'Next.js',
-        bgHex: '#000000',
-        borderHex: '#000000',
-        textHex: '#FFFFFF'
+        bg_hex: '#000000',
+        border_hex: '#000000',
+        text_hex: '#FFFFFF'
       },
       {
         name: 'React',
-        bgHex: '#61DAFB',
-        borderHex: '#61DAFB',
-        textHex: '#000000'
+        bg_hex: '#61DAFB',
+        border_hex: '#61DAFB',
+        text_hex: '#000000'
       },
       {
         name: 'Vue.js',
-        bgHex: '#4FC08D',
-        borderHex: '#4FC08D',
-        textHex: '#FFFFFF'
+        bg_hex: '#4FC08D',
+        border_hex: '#4FC08D',
+        text_hex: '#FFFFFF'
       },
       {
         name: 'Laravel',
-        bgHex: '#FF2D20',
-        borderHex: '#FF2D20',
-        textHex: '#FFFFFF'
+        bg_hex: '#FF2D20',
+        border_hex: '#FF2D20',
+        text_hex: '#FFFFFF'
       },
       {
         name: 'Express.js',
-        bgHex: '#000000',
-        borderHex: '#000000',
-        textHex: '#FFFFFF'
+        bg_hex: '#000000',
+        border_hex: '#000000',
+        text_hex: '#FFFFFF'
       },
       {
         name: 'PostgreSQL',
-        bgHex: '#336791',
-        borderHex: '#336791',
-        textHex: '#FFFFFF'
+        bg_hex: '#336791',
+        border_hex: '#336791',
+        text_hex: '#FFFFFF'
       },
       {
         name: 'MySQL',
-        bgHex: '#4479A1',
-        borderHex: '#4479A1',
-        textHex: '#FFFFFF'
+        bg_hex: '#4479A1',
+        border_hex: '#4479A1',
+        text_hex: '#FFFFFF'
       },
       {
         name: 'TailwindCSS',
-        bgHex: '#06B6D4',
-        borderHex: '#06B6D4',
-        textHex: '#FFFFFF'
+        bg_hex: '#06B6D4',
+        border_hex: '#06B6D4',
+        text_hex: '#FFFFFF'
       },
       {
         name: 'Flutter',
-        bgHex: '#02569B',
-        borderHex: '#02569B',
-        textHex: '#FFFFFF'
+        bg_hex: '#02569B',
+        border_hex: '#02569B',
+        text_hex: '#FFFFFF'
       },
       {
         name: 'React Native',
-        bgHex: '#61DAFB',
-        borderHex: '#61DAFB',
-        textHex: '#000000'
+        bg_hex: '#61DAFB',
+        border_hex: '#61DAFB',
+        text_hex: '#000000'
       }
     ]).returning();
 
@@ -174,13 +174,13 @@ async function seed() {
     const adminUser = await db.insert(users).values({
       username: 'admin',
       email: 'admin@smkn4malang.sch.id',
-      passwordHash: adminPassword,
+      password_hash: adminPassword,
       role: 'admin'
     }).returning();
 
     await db.insert(admins).values({
-      userId: adminUser[0].id,
-      fullName: 'Administrator'
+      user_id: adminUser[0].id,
+      full_name: 'Administrator'
     });
 
     // Create sample student user
@@ -189,13 +189,13 @@ async function seed() {
     const studentUser = await db.insert(users).values({
       username: 'johndoe',
       email: 'john.doe@student.smkn4malang.sch.id',
-      passwordHash: studentPassword,
+      password_hash: studentPassword,
       role: 'student'
     }).returning();
 
     await db.insert(students).values({
-      userId: studentUser[0].id,
-      fullName: 'John Doe',
+      user_id: studentUser[0].id,
+      full_name: 'John Doe',
       bio: 'Passionate full-stack developer with experience in modern web technologies.',
       githubUrl: 'https://github.com/johndoe',
       linkedinUrl: 'https://linkedin.com/in/johndoe',
