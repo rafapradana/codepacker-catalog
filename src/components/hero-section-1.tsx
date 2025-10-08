@@ -126,10 +126,11 @@ export function HeroSection() {
                                         key={1}
                                         className="bg-foreground/10 rounded-[14px] border p-0.5">
                                         <Button
+                                            key={1}
                                             asChild
                                             size="lg"
                                             className="rounded-xl px-5 text-base">
-                                            <Link href="/dashboard">
+                                            <Link href="/projects">
                                                 <span className="text-nowrap">Jelajahi Project</span>
                                             </Link>
                                         </Button>

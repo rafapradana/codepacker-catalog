@@ -17,10 +17,15 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>
 
+interface LoginFormProps extends React.ComponentProps<"form"> {
+  userType?: "admin" | "student"
+}
+
 export function LoginForm({
   className,
+  userType = "admin",
   ...props
-}: React.ComponentProps<"form">) {
+}: LoginFormProps) {
   const { theme } = useTheme()
   const router = useRouter()
   const [formData, setFormData] = useState<LoginFormData>({
@@ -77,7 +82,12 @@ export function LoginForm({
 
       if (result.success) {
         // Redirect to admin dashboard
-        router.push('/admin/dashboard')
+    if (userType === "admin") {
+      router.push('/admin/dashboard')
+    } else {
+      // Redirect to student profile or projects page
+      router.push('/projects')
+    }
       } else {
         setLoginError(result.error || 'Login failed')
       }
@@ -101,9 +111,14 @@ export function LoginForm({
             className="h-10 w-auto"
           />
         </div>
-        <h1 className="text-2xl font-bold">Login Admin</h1>
+        <h1 className="text-2xl font-bold">
+          {userType === "admin" ? "Login Admin" : "Login Siswa"}
+        </h1>
         <p className="text-muted-foreground text-sm text-balance">
-          Masukkan kredensial Anda untuk mengakses panel admin CodePacker Catalog
+          {userType === "admin" 
+            ? "Masukkan kredensial Anda untuk mengakses panel admin CodePacker Catalog"
+            : "Masukkan kredensial Anda untuk mengakses CodePacker Catalog"
+          }
         </p>
       </div>
       
