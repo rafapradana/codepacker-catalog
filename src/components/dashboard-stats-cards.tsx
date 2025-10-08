@@ -31,7 +31,7 @@ export function DashboardStatsCards({ stats }: DashboardStatsCardsProps) {
         </CardHeader>
         <CardFooter className="pt-0">
           <p className="text-sm text-muted-foreground">
-            Registered students in the system
+            Total students in the system
           </p>
         </CardFooter>
       </Card>
