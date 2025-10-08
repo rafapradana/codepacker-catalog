@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
-import { projects, students, categories, projectTechstacks, projectMedia, techstacks } from '@/lib/schema';
+import { projects, students, categories, projectTechstacks, projectMedia, techstacks, users, classes } from '@/lib/schema';
 import { eq, and } from 'drizzle-orm';
 
 // Zod schema for updating a project
@@ -46,6 +46,9 @@ export async function GET(
           id: students.id,
           fullName: students.fullName,
           profilePhotoUrl: students.profilePhotoUrl,
+          userId: students.userId,
+          username: users.username,
+          className: classes.name,
         },
         category: {
           id: categories.id,
@@ -57,6 +60,8 @@ export async function GET(
       })
       .from(projects)
       .leftJoin(students, eq(projects.studentId, students.id))
+      .leftJoin(users, eq(students.userId, users.id))
+      .leftJoin(classes, eq(students.classId, classes.id))
       .leftJoin(categories, eq(projects.categoryId, categories.id))
       .where(eq(projects.id, projectId))
       .limit(1);
