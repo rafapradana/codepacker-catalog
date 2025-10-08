@@ -1,16 +1,7 @@
-import { Navigation } from "@/components/navigation";
-import { HeroSection } from "@/components/hero-section";
-import { AboutSection } from "@/components/about-section";
-import { StatsSection } from "@/components/stats-section";
-import { TopProjectsSection } from "@/components/top-projects-section";
-import { TopStudentsSection } from "@/components/top-students-section";
-import { FeatureCard } from "@/components/feature-card";
-import { ProjectCard } from "@/components/project-card";
-import { StudentCard } from "@/components/student-card";
-import { Footer } from "@/components/footer";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Users, FolderOpen, Search, Code, Palette, Zap } from "lucide-react";
+import { HeroSection } from "@/components/hero-section-1";
+import AboutCodePackerCatalog from "@/components/features-1";
+import CodePackerMainFeatures from "@/components/features-8";
+import CodePackerCatalogFAQ from "@/components/faqs-3";
 
 export default function Home() {
   // Mock data for featured projects and students
@@ -76,28 +67,11 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <Navigation />
-
-      {/* Hero Section */}
+    <>
       <HeroSection />
-
-      {/* About Section */}
-      <AboutSection />
-
-      {/* Stats Section */}
-      <StatsSection />
-
-      {/* Top Projects Section */}
-      <TopProjectsSection />
-
-      {/* Top Students Section */}
-      <TopStudentsSection />
-
-
-      {/* Footer */}
-      <Footer />
-    </div>
+      <AboutCodePackerCatalog />
+      <CodePackerMainFeatures />
+      <CodePackerCatalogFAQ />
+    </>
   );
 }

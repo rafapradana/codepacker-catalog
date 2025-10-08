@@ -1,181 +1,256 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useSession, signOut } from "@/lib/auth-client";
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { 
+  BookOpen, 
+  Code, 
+  Github, 
+  Globe, 
+  LogOut, 
+  Plus, 
+  Star,
+  TrendingUp,
+  Users
+} from "lucide-react"
 
-export default function DashboardPage() {
-  const { data: session, isPending } = useSession();
-  const router = useRouter();
-  const [isSigningOut, setIsSigningOut] = useState(false);
+interface User {
+  id: string
+  name: string
+  email: string
+}
 
-  useEffect(() => {
-    if (!isPending && !session) {
-      router.push("/login");
+interface Project {
+  id: string
+  title: string
+  description: string
+  techStack: string[]
+  category: string
+  githubUrl: string
+  liveDemoUrl?: string
+  thumbnailUrl?: string
+  createdAt: string
+}
+
+export default function StudentDashboard() {
+  const [user, setUser] = useState<User | null>(null)
+  const router = useRouter()
+
+  // Mock data for testing
+  const mockProjects: Project[] = [
+    {
+      id: "1",
+      title: "E-Commerce Website",
+      description: "Full-stack e-commerce platform dengan React dan Node.js",
+      techStack: ["React", "Node.js", "MongoDB", "Express"],
+      category: "Web Development",
+      githubUrl: "https://github.com/student/ecommerce",
+      liveDemoUrl: "https://ecommerce-demo.vercel.app",
+      createdAt: "2024-01-15"
+    },
+    {
+      id: "2", 
+      title: "Mobile Todo App",
+      description: "Aplikasi todo list dengan React Native dan Firebase",
+      techStack: ["React Native", "Firebase", "TypeScript"],
+      category: "Mobile Development",
+      githubUrl: "https://github.com/student/todo-app",
+      createdAt: "2024-01-10"
+    },
+    {
+      id: "3",
+      title: "Data Visualization Dashboard",
+      description: "Dashboard analitik data dengan D3.js dan Python",
+      techStack: ["Python", "D3.js", "Flask", "PostgreSQL"],
+      category: "Data Science",
+      githubUrl: "https://github.com/student/data-viz",
+      liveDemoUrl: "https://data-viz-demo.herokuapp.com",
+      createdAt: "2024-01-05"
     }
-  }, [session, isPending, router]);
+  ]
 
-  const handleSignOut = async () => {
-    setIsSigningOut(true);
-    try {
-      await signOut();
-      router.push("/");
-    } catch (error) {
-      console.error("Sign out error:", error);
-    } finally {
-      setIsSigningOut(false);
-    }
-  };
-
-  if (isPending) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
-        </div>
-      </div>
-    );
+  const stats = {
+    totalProjects: mockProjects.length,
+    totalViews: 1250,
+    githubStars: 45,
+    completedProjects: 8
   }
 
-  if (!session) {
-    return null; // Will redirect to login
+  useEffect(() => {
+    // Check if user is logged in
+    const studentData = localStorage.getItem("student")
+    if (studentData) {
+      setUser(JSON.parse(studentData))
+    } else {
+      router.push("/login")
+    }
+  }, [router])
+
+  const handleLogout = () => {
+    localStorage.removeItem("student")
+    router.push("/login")
+  }
+
+  if (!user) {
+    return <div>Loading...</div>
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">CP</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">Dashboard</span>
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-14 items-center">
+          <div className="flex items-center gap-2 font-medium">
+            <div className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-md">
+              <BookOpen className="size-4" />
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                Welcome, {session.user.name || session.user.email}
-              </span>
-              <Button 
-                variant="outline" 
-                onClick={handleSignOut}
-                disabled={isSigningOut}
-              >
-                {isSigningOut ? "Signing out..." : "Sign Out"}
-              </Button>
+            <span className="text-lg font-semibold">CodePacker Catalog</span>
+          </div>
+          <div className="ml-auto flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Avatar className="h-8 w-8">
+                <AvatarFallback>
+                  {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-sm font-medium">{user?.name || 'User'}</span>
             </div>
+            <Button variant="ghost" size="sm" onClick={handleLogout}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
+            </Button>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <div className="container py-6">
+        {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Welcome to CodePacker Catalog
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            This is your dashboard. Authentication is working successfully!
+          <h1 className="text-3xl font-bold mb-2">Selamat Datang, {user.name}!</h1>
+          <p className="text-muted-foreground">
+            Kelola portfolio dan project coding kamu di sini
           </p>
         </div>
 
-        {/* User Info Card */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {/* Stats Cards */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
           <Card>
-            <CardHeader>
-              <CardTitle>User Information</CardTitle>
-              <CardDescription>Your account details</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Projects</CardTitle>
+              <Code className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent className="space-y-2">
-              <div>
-                <span className="font-medium">Email:</span>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{session.user.email}</p>
-              </div>
-              <div>
-                <span className="font-medium">Name:</span>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {session.user.name || "Not set"}
-                </p>
-              </div>
-              <div>
-                <span className="font-medium">Role:</span>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {(session.user as any).role || "student"}
-                </p>
-              </div>
-              <div>
-                <span className="font-medium">User ID:</span>
-                <p className="text-xs text-gray-500 dark:text-gray-500 font-mono">
-                  {session.user.id}
-                </p>
-              </div>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.totalProjects}</div>
+              <p className="text-xs text-muted-foreground">
+                +2 dari bulan lalu
+              </p>
             </CardContent>
           </Card>
-
           <Card>
-            <CardHeader>
-              <CardTitle>Session Info</CardTitle>
-              <CardDescription>Current session details</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Views</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent className="space-y-2">
-              <div>
-                <span className="font-medium">Session ID:</span>
-                <p className="text-xs text-gray-500 dark:text-gray-500 font-mono">
-                  {session.session.id}
-                </p>
-              </div>
-              <div>
-                <span className="font-medium">Expires At:</span>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {new Date(session.session.expiresAt).toLocaleString()}
-                </p>
-              </div>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.totalViews}</div>
+              <p className="text-xs text-muted-foreground">
+                +15% dari minggu lalu
+              </p>
             </CardContent>
           </Card>
-
           <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>What would you like to do?</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">GitHub Stars</CardTitle>
+              <Star className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent className="space-y-3">
-              <Button className="w-full" variant="outline" disabled>
-                View Profile (Coming Soon)
-              </Button>
-              <Button className="w-full" variant="outline" disabled>
-                My Projects (Coming Soon)
-              </Button>
-              <Button className="w-full" variant="outline" disabled>
-                Settings (Coming Soon)
-              </Button>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.githubStars}</div>
+              <p className="text-xs text-muted-foreground">
+                +5 stars baru
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Completed</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.completedProjects}</div>
+              <p className="text-xs text-muted-foreground">
+                Projects selesai
+              </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Success Message */}
-        <Card className="border-green-200 bg-green-50 dark:bg-green-900/20 dark:border-green-800">
-          <CardHeader>
-            <CardTitle className="text-green-800 dark:text-green-400">
-              🎉 Authentication Setup Complete!
-            </CardTitle>
-            <CardDescription className="text-green-700 dark:text-green-300">
-              Better Auth is working correctly with your database integration.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 text-sm text-green-700 dark:text-green-300">
-              <p>✅ User registration and login working</p>
-              <p>✅ Session management active</p>
-              <p>✅ Database integration successful</p>
-              <p>✅ Protected routes functioning</p>
-            </div>
-          </CardContent>
-        </Card>
-      </main>
+        {/* Projects Section */}
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold">Projects Terbaru</h2>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Tambah Project
+            </Button>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {mockProjects.map((project) => (
+              <Card key={project.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-1">
+                      <CardTitle className="text-lg">{project.title}</CardTitle>
+                      <Badge variant="secondary">{project.category}</Badge>
+                    </div>
+                  </div>
+                  <CardDescription className="line-clamp-2">
+                    {project.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {/* Tech Stack */}
+                    <div className="flex flex-wrap gap-1">
+                      {project.techStack.map((tech) => (
+                        <Badge key={tech} variant="outline" className="text-xs">
+                          {tech}
+                        </Badge>
+                      ))}
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" asChild>
+                        <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+                          <Github className="h-4 w-4 mr-1" />
+                          GitHub
+                        </a>
+                      </Button>
+                      {project.liveDemoUrl && (
+                        <Button variant="outline" size="sm" asChild>
+                          <a href={project.liveDemoUrl} target="_blank" rel="noopener noreferrer">
+                            <Globe className="h-4 w-4 mr-1" />
+                            Demo
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+
+                    <div className="text-xs text-muted-foreground">
+                      Dibuat: {new Date(project.createdAt).toLocaleDateString('id-ID')}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
-  );
+  )
 }

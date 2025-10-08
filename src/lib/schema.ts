@@ -29,24 +29,18 @@ export const session = pgTable("session", {
     .references(() => users.id, { onDelete: "cascade" }),
 });
 
-export const account = pgTable("account", {
-  id: text("id").primaryKey(),
-  accountId: text("account_id").notNull(),
-  providerId: text("provider_id").notNull(),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  accessToken: text("access_token"),
-  refreshToken: text("refresh_token"),
-  idToken: text("id_token"),
-  accessTokenExpiresAt: timestamp("access_token_expires_at"),
-  refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
-  scope: text("scope"),
-  password: text("password"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .$onUpdate(() => new Date())
-    .notNull(),
+// Students table
+export const students = pgTable('students', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').references(() => users.id).notNull(),
+  fullName: varchar('full_name', { length: 255 }).notNull(),
+  bio: text('bio'),
+  profilePhotoUrl: varchar('profile_photo_url', { length: 500 }),
+  githubUrl: varchar('github_url', { length: 500 }),
+  linkedinUrl: varchar('linkedin_url', { length: 500 }),
+  classId: uuid('class_id').references(() => classes.id),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const verification = pgTable("verification", {
@@ -90,14 +84,18 @@ export const admins = pgTable("admins", {
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const categories = pgTable("categories", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull().unique(),
-  bg_hex: text("bg_hex"),
-  border_hex: text("border_hex"),
-  text_hex: text("text_hex"),
-  created_at: timestamp("created_at").defaultNow().notNull(),
-  updated_at: timestamp("updated_at").defaultNow().notNull(),
+// Projects table
+export const projects = pgTable('projects', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  studentId: uuid('student_id').references(() => students.id).notNull(),
+  title: varchar('title', { length: 255 }).notNull(),
+  description: text('description'),
+  thumbnailUrl: varchar('thumbnail_url', { length: 500 }),
+  githubUrl: varchar('github_url', { length: 500 }).notNull(),
+  liveDemoUrl: varchar('live_demo_url', { length: 500 }),
+  categoryId: uuid('category_id').references(() => categories.id),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const skills = pgTable("skills", {

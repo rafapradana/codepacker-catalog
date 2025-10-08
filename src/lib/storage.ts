@@ -2,8 +2,18 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
+// Client for public operations (frontend)
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Admin client for server-side operations (storage management)
+export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+});
 
 // Storage bucket names
 export const STORAGE_BUCKETS = {
@@ -34,7 +44,7 @@ export interface UploadResult {
  */
 export async function uploadFile({ bucket, path, file, upsert = false }: UploadOptions): Promise<UploadResult> {
   try {
-    const { data, error } = await supabase.storage
+    const { data, error } = await supabaseAdmin.storage
       .from(bucket)
       .upload(path, file, {
         upsert,
@@ -152,7 +162,7 @@ export function validateFile(file: File, options: FileValidationOptions): FileVa
 }
 
 // Predefined validation options for different file types
-export const FILE_VALIDATION_OPTIONS = {
+export const FILE_VALIDATION_OPTIONS: Record<string, FileValidationOptions> = {
   PROFILE_PHOTO: {
     allowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
     maxSize: 5 * 1024 * 1024 // 5MB

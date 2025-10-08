@@ -22,11 +22,7 @@
 
 ### 🔐 Authentication
 
-* **Better-auth** → login siswa & admin dengan username/email + password.
-
-### ⚡ Performance
-
-* **Redis** → caching query.
+* **Custom Auth** → login siswa & admin dengan username/email + password (simple implementation).
 
 ### 🧪 Testing
 

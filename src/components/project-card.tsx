@@ -1,126 +1,207 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import Image from "next/image";
-import { Github, ExternalLink, User } from "lucide-react";
+"use client"
+
+import * as React from "react"
+import { IconBrandGithub, IconExternalLink, IconCalendar, IconEdit, IconTrash, IconEye } from "@tabler/icons-react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { ProjectWithDetails } from "@/lib/projects"
 
 interface ProjectCardProps {
-  id: string;
-  title: string;
-  description: string;
-  thumbnail?: string;
-  studentName: string;
-  studentId: string;
-  githubUrl?: string;
-  liveDemoUrl?: string;
-  techStacks: string[];
-  category?: string;
-  className?: string;
+  project: ProjectWithDetails
+  onEdit: (project: ProjectWithDetails) => void
+  onDelete: (projectId: string) => void
+  onView: (project: ProjectWithDetails) => void
+  isLoading?: boolean
 }
 
-export function ProjectCard({
-  id,
-  title,
-  description,
-  thumbnail,
-  studentName,
-  studentId,
-  githubUrl,
-  liveDemoUrl,
-  techStacks,
-  category,
-  className = ""
-}: ProjectCardProps) {
+export function ProjectCard({ project, onEdit, onDelete, onView, isLoading = false }: ProjectCardProps) {
   return (
-    <Card className={`group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${className}`}>
+    <div className="group relative overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-all hover:shadow-md">
       {/* Thumbnail */}
-      <div className="relative h-48 bg-gradient-to-br from-blue-50 to-indigo-100 overflow-hidden">
-        {thumbnail ? (
-          <Image
-            src={thumbnail}
-            alt={title}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
+      <div className="relative aspect-video overflow-hidden bg-muted">
+        {project.thumbnailUrl ? (
+          <img
+            src={project.thumbnailUrl}
+            alt={project.title}
+            className="h-full w-full object-cover transition-transform group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="w-16 h-16 bg-blue-200 rounded-lg flex items-center justify-center">
-              <span className="text-blue-600 font-bold text-xl">{title.charAt(0)}</span>
-            </div>
-          </div>
-        )}
-        {category && (
-          <div className="absolute top-3 left-3">
-            <span className="px-2 py-1 bg-white/90 backdrop-blur-sm text-xs font-medium text-gray-700 rounded-full">
-              {category}
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-muted/50">
+            <span className="text-4xl font-bold text-muted-foreground/30">
+              {project.title.charAt(0).toUpperCase()}
             </span>
           </div>
+        )}
+        
+        {/* Category Badge - Positioned at top-left corner */}
+        {project.category && (
+          <Badge 
+            variant="secondary" 
+            className="absolute top-2 left-2 text-xs shadow-sm"
+            style={{
+              backgroundColor: project.category.bgHex || undefined,
+              borderColor: project.category.borderHex || undefined,
+              color: project.category.textHex || undefined,
+            }}
+          >
+            {project.category.name}
+          </Badge>
         )}
       </div>
 
-      <CardContent className="p-6">
-        {/* Title */}
-        <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-1">{title}</h3>
-        
-        {/* Student */}
-        <div className="flex items-center text-sm text-gray-600 mb-3">
-          <User className="w-4 h-4 mr-1" />
-          <Link 
-            href={`/students/${studentId}`}
-            className="hover:text-blue-600 transition-colors"
-          >
-            {studentName}
-          </Link>
+      {/* Content */}
+      <div className="p-4 space-y-3">
+        {/* Header */}
+        <div className="space-y-2">
+          <h3 className="font-semibold text-lg leading-tight line-clamp-2">{project.title}</h3>
+          {project.description && (
+            <p className="text-sm text-muted-foreground line-clamp-2">{project.description}</p>
+          )}
         </div>
 
-        {/* Description */}
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
-          {description}
-        </p>
+        {/* Student Info */}
+        <div className="flex items-center gap-2">
+          <Avatar className="h-6 w-6">
+            <AvatarImage src={project.student?.profilePhotoUrl || ""} />
+            <AvatarFallback className="text-xs">
+              {project.student?.fullName?.charAt(0) || "?"}
+            </AvatarFallback>
+          </Avatar>
+          <span className="text-sm text-muted-foreground truncate">
+            {project.student?.fullName || "Unknown Student"}
+          </span>
+        </div>
 
         {/* Tech Stacks */}
-        <div className="flex flex-wrap gap-1 mb-4">
-          {techStacks.slice(0, 3).map((tech, index) => (
-            <span
-              key={index}
-              className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md font-medium"
+        {project.techstacks && project.techstacks.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {project.techstacks.slice(0, 3).map((pt) => (
+              pt.techstack && (
+                <Badge
+                  key={pt.id}
+                  variant="outline"
+                  className="text-xs px-2 py-0.5"
+                  style={{
+                    backgroundColor: pt.techstack.bgHex || undefined,
+                    borderColor: pt.techstack.borderHex || undefined,
+                    color: pt.techstack.textHex || undefined,
+                  }}
+                >
+                  {pt.techstack.name}
+                </Badge>
+              )
+            ))}
+            {project.techstacks.length > 3 && (
+              <Badge variant="outline" className="text-xs px-2 py-0.5">
+                +{project.techstacks.length - 3}
+              </Badge>
+            )}
+          </div>
+        )}
+
+        {/* Date */}
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <IconCalendar className="h-3 w-3" />
+          <span>{new Date(project.createdAt).toLocaleDateString('id-ID')}</span>
+        </div>
+
+        {/* Links */}
+        <div className="flex items-center gap-2">
+          {project.githubUrl && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 px-2"
+              onClick={(e) => {
+                e.stopPropagation()
+                window.open(project.githubUrl, '_blank')
+              }}
             >
-              {tech}
-            </span>
-          ))}
-          {techStacks.length > 3 && (
-            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md font-medium">
-              +{techStacks.length - 3}
-            </span>
+              <IconBrandGithub className="h-3 w-3" />
+            </Button>
+          )}
+          {project.liveDemoUrl && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 px-2"
+              onClick={(e) => {
+                e.stopPropagation()
+                window.open(project.liveDemoUrl, '_blank')
+              }}
+            >
+              <IconExternalLink className="h-3 w-3" />
+            </Button>
           )}
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-between">
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/projects/${id}`}>
-              View Details
-            </Link>
+        <div className="flex items-center justify-between pt-2 border-t">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onView(project)}
+            className="h-8 px-2 text-xs"
+          >
+            <IconEye className="h-3 w-3 mr-1" />
+            Detail
           </Button>
           
-          <div className="flex items-center space-x-2">
-            {githubUrl && (
-              <Button asChild variant="ghost" size="sm" className="p-2">
-                <Link href={githubUrl} target="_blank" rel="noopener noreferrer">
-                  <Github className="w-4 h-4" />
-                </Link>
-              </Button>
-            )}
-            {liveDemoUrl && (
-              <Button asChild variant="ghost" size="sm" className="p-2">
-                <Link href={liveDemoUrl} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="w-4 h-4" />
-                </Link>
-              </Button>
-            )}
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onEdit(project)}
+              className="h-8 px-2"
+            >
+              <IconEdit className="h-3 w-3" />
+            </Button>
+            
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-2 text-destructive hover:text-destructive"
+                >
+                  <IconTrash className="h-3 w-3" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Hapus Project</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Apakah Anda yakin ingin menghapus project "{project.title}"? 
+                    Tindakan ini tidak dapat dibatalkan.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Batal</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => onDelete(project.id)}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Menghapus..." : "Hapus"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
-      </CardContent>
-    </Card>
-  );
+      </div>
+    </div>
+  )
 }

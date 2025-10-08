@@ -197,10 +197,9 @@ async function seed() {
       user_id: studentUser[0].id,
       full_name: 'John Doe',
       bio: 'Passionate full-stack developer with experience in modern web technologies.',
-      github_url: 'https://github.com/johndoe',
-      linkedin_url: 'https://linkedin.com/in/johndoe',
-      profile_complete: true,
-      class_id: classesData[0].id
+      githubUrl: 'https://github.com/johndoe',
+      linkedinUrl: 'https://linkedin.com/in/johndoe',
+      classId: classesData[0].id
     });
 
     console.log('✅ Database seeding completed successfully!');
