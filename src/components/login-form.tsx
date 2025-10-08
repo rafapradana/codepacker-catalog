@@ -85,8 +85,8 @@ export function LoginForm({
     if (userType === "admin") {
       router.push('/admin/dashboard')
     } else {
-      // Redirect to student profile or projects page
-      router.push('/projects')
+      // Redirect to student app
+      router.push('/app')
     }
       } else {
         setLoginError(result.error || 'Login failed')
