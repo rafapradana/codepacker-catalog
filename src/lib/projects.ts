@@ -20,6 +20,8 @@ export interface ProjectWithDetails extends Project {
     id: string;
     fullName: string;
     profilePhotoUrl: string | null;
+    classId: string | null;
+    className: string | null;
   } | null;
   category: {
     id: string;

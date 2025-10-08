@@ -164,7 +164,7 @@ export default function SiswaPage() {
       {/* Reusable Guest Navbar */}
       <GuestNavbar />
       
-      <main className="container mx-auto px-4 py-8 pt-24">
+      <main className="container mx-auto px-4 lg:px-16 xl:px-24 py-8 pt-24">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-center mb-2">Siswa CodePacker</h1>
           <p className="text-muted-foreground text-center mb-8">

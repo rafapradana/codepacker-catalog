@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
-import { projects, students, categories, projectTechstacks, projectMedia, techstacks } from '@/lib/schema';
-import { eq, desc } from 'drizzle-orm';
+import { projects, students, categories, projectTechstacks, projectMedia, techstacks, classes } from '@/lib/schema';
+import { eq, desc, like, and, inArray } from 'drizzle-orm';
 
 // Zod schema for creating a project
 const createProjectSchema = z.object({
@@ -17,11 +17,30 @@ const createProjectSchema = z.object({
   techstackIds: z.array(z.string()).optional().default([])
 });
 
-// GET /api/projects - Get all projects with relations
-export async function GET() {
+// GET /api/projects - Get all projects with relations and pagination
+export async function GET(request: NextRequest) {
   try {
-    // Get all projects with basic relations
-    const allProjects = await db
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '12');
+    const search = searchParams.get('search') || '';
+    const categoryId = searchParams.get('categoryId') || '';
+    
+    const offset = (page - 1) * limit;
+
+    // Build where conditions
+    const whereConditions = [];
+    
+    if (search) {
+      whereConditions.push(like(projects.title, `%${search}%`));
+    }
+    
+    if (categoryId) {
+      whereConditions.push(eq(projects.categoryId, categoryId));
+    }
+
+    // Get projects with basic relations
+    const projectsQuery = db
       .select({
         id: projects.id,
         title: projects.title,
@@ -35,6 +54,8 @@ export async function GET() {
           id: students.id,
           fullName: students.fullName,
           profilePhotoUrl: students.profilePhotoUrl,
+          classId: students.classId,
+          className: classes.name,
         },
         category: {
           id: categories.id,
@@ -46,23 +67,53 @@ export async function GET() {
       })
       .from(projects)
       .leftJoin(students, eq(projects.studentId, students.id))
+      .leftJoin(classes, eq(students.classId, classes.id))
       .leftJoin(categories, eq(projects.categoryId, categories.id))
       .orderBy(desc(projects.createdAt));
 
-    // Get media and techstacks for all projects
-    const projectIds = allProjects.map(p => p.id);
-    
-    // Get all media for these projects
-    const allMedia = await db
-      .select()
-      .from(projectMedia)
-      .where(eq(projectMedia.projectId, projectIds[0])); // This won't work for multiple IDs
+    // Apply where conditions if any
+    if (whereConditions.length > 0) {
+      projectsQuery.where(and(...whereConditions));
+    }
 
-    // Get all techstacks for these projects  
+    // Get paginated results
+    const paginatedProjects = await projectsQuery
+      .limit(limit)
+      .offset(offset);
+
+    // Get total count for pagination
+    const totalCountQuery = db
+      .select({ count: projects.id })
+      .from(projects)
+      .leftJoin(categories, eq(projects.categoryId, categories.id));
+    
+    if (whereConditions.length > 0) {
+      totalCountQuery.where(and(...whereConditions));
+    }
+    
+    const totalCount = (await totalCountQuery).length;
+
+    // Get project IDs for fetching relations
+    const projectIds = paginatedProjects.map(p => p.id);
+    
+    if (projectIds.length === 0) {
+      return NextResponse.json({
+        projects: [],
+        pagination: {
+          page,
+          limit,
+          total: totalCount,
+          totalPages: Math.ceil(totalCount / limit),
+          hasNext: false,
+          hasPrev: page > 1
+        }
+      });
+    }
+
+    // Get all techstacks for these projects
     const allTechstacks = await db
       .select({
         projectId: projectTechstacks.projectId,
-        id: projectTechstacks.id,
         techstack: {
           id: techstacks.id,
           name: techstacks.name,
@@ -73,15 +124,17 @@ export async function GET() {
         },
       })
       .from(projectTechstacks)
-      .leftJoin(techstacks, eq(projectTechstacks.techstackId, techstacks.id));
+      .leftJoin(techstacks, eq(projectTechstacks.techstackId, techstacks.id))
+      .where(inArray(projectTechstacks.projectId, projectIds as string[]));
 
     // Get all media for these projects
     const allProjectMedia = await db
       .select()
-      .from(projectMedia);
+      .from(projectMedia)
+      .where(inArray(projectMedia.projectId, projectIds as string[]));
 
     // Combine data
-    const projectsWithRelations = allProjects.map(project => {
+    const projectsWithRelations = paginatedProjects.map(project => {
       const projectTechstacksList = allTechstacks.filter(pt => pt.projectId === project.id);
       const projectMediaList = allProjectMedia.filter(pm => pm.projectId === project.id);
       
@@ -92,7 +145,17 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json(projectsWithRelations);
+    return NextResponse.json({
+      projects: projectsWithRelations,
+      pagination: {
+        page,
+        limit,
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        hasNext: page < Math.ceil(totalCount / limit),
+        hasPrev: page > 1
+      }
+    });
   } catch (error) {
     console.error('Error fetching projects:', error);
     return NextResponse.json(

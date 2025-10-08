@@ -40,23 +40,23 @@ export function StudentCard({ student }: StudentCardProps) {
   return (
     <Card className="group relative overflow-hidden bg-card border border-border hover:shadow-lg transition-all duration-300 ease-out">
       {/* Header - Centered Profile Photo */}
-      <CardHeader className="pb-4 text-center">
-        <div className="flex flex-col items-center space-y-3">
+      <CardHeader className="pb-3 text-center">
+        <div className="flex flex-col items-center space-y-2">
           {/* Profile Photo - Center */}
-          <Avatar className="h-20 w-20 ring-2 ring-border">
+          <Avatar className="h-16 w-16 ring-2 ring-border">
             <AvatarImage src={student.profilePhotoUrl || ""} />
-            <AvatarFallback className="bg-muted text-muted-foreground font-semibold text-xl">
+            <AvatarFallback className="bg-muted text-muted-foreground font-semibold text-lg">
               {student.fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           
           {/* Full Name - Center */}
-          <h3 className="font-semibold text-lg leading-tight text-card-foreground">
+          <h3 className="font-semibold text-base leading-tight text-card-foreground">
             {student.fullName}
           </h3>
           
           {/* Username • Class - Center */}
-          <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
+          <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
             {student.user?.username && (
               <>
                 <span>@{student.user.username}</span>
@@ -75,23 +75,23 @@ export function StudentCard({ student }: StudentCardProps) {
           
           {/* Social Links - Center */}
           {(student.githubUrl || student.linkedinUrl) && (
-            <div className="flex gap-2 justify-center">
+            <div className="flex gap-1.5 justify-center">
               {student.githubUrl && (
                 <Link 
                   href={student.githubUrl} 
                   target="_blank" 
-                  className="p-2 rounded-md bg-muted hover:bg-muted/80 transition-colors group/social"
+                  className="p-1.5 rounded-md bg-muted hover:bg-muted/80 transition-colors group/social"
                 >
-                  <IconBrandGithub className="h-4 w-4 text-muted-foreground group-hover/social:text-card-foreground transition-colors" />
+                  <IconBrandGithub className="h-3.5 w-3.5 text-muted-foreground group-hover/social:text-card-foreground transition-colors" />
                 </Link>
               )}
               {student.linkedinUrl && (
                 <Link 
                   href={student.linkedinUrl} 
                   target="_blank" 
-                  className="p-2 rounded-md bg-muted hover:bg-muted/80 transition-colors group/social"
+                  className="p-1.5 rounded-md bg-muted hover:bg-muted/80 transition-colors group/social"
                 >
-                  <IconBrandLinkedin className="h-4 w-4 text-muted-foreground group-hover/social:text-card-foreground transition-colors" />
+                  <IconBrandLinkedin className="h-3.5 w-3.5 text-muted-foreground group-hover/social:text-card-foreground transition-colors" />
                 </Link>
               )}
             </div>
@@ -100,11 +100,11 @@ export function StudentCard({ student }: StudentCardProps) {
       </CardHeader>
 
       {/* Content */}
-      <CardContent className="px-6 pb-4 space-y-4">
+      <CardContent className="px-5 pb-3 space-y-3">
         {/* Bio - Left Align */}
         {student.bio && (
           <div>
-            <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed text-left">
+            <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed text-left">
               {student.bio}
             </p>
           </div>
@@ -112,13 +112,13 @@ export function StudentCard({ student }: StudentCardProps) {
 
         {/* Skills - Left Align */}
         {student.skills.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-card-foreground text-left">Skills</h4>
-            <div className="flex flex-wrap gap-2">
+          <div className="space-y-1.5">
+            <h4 className="text-xs font-medium text-card-foreground text-left">Skills</h4>
+            <div className="flex flex-wrap gap-1.5">
               {displayedSkills.map((skill) => (
                 <Badge
                   key={skill.id}
-                  className="text-xs px-2 py-1 font-medium transition-all duration-200 hover:scale-105"
+                  className="text-xs px-1.5 py-0.5 font-medium transition-all duration-200 hover:scale-105"
                   style={{
                     backgroundColor: skill.bgHex,
                     borderColor: skill.borderHex,
@@ -129,7 +129,7 @@ export function StudentCard({ student }: StudentCardProps) {
                 </Badge>
               ))}
               {student.skills.length > 4 && (
-                <Badge variant="outline" className="text-xs px-2 py-1 text-muted-foreground border-dashed">
+                <Badge variant="outline" className="text-xs px-1.5 py-0.5 text-muted-foreground border-dashed">
                   +{student.skills.length - 4}
                 </Badge>
               )}
@@ -139,12 +139,13 @@ export function StudentCard({ student }: StudentCardProps) {
       </CardContent>
 
       {/* Footer - Full Width Button */}
-      <CardFooter className="px-6 pt-0 pb-6">
+      <CardFooter className="px-5 pt-0 pb-4">
         <Button 
           asChild 
+          size="sm"
           className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-all duration-200"
         >
-          <Link href={`/siswa/${student.id}`}>
+          <Link href={`/${student.user?.username || student.id}`}>
             Lihat Profil
           </Link>
         </Button>

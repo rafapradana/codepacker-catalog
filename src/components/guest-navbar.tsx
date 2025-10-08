@@ -9,7 +9,7 @@ import { ModeToggle } from '@/components/mode-toggle'
 
 const menuItems = [
     { name: 'Siswa', href: '/siswa' },
-    { name: 'Project', href: '/dashboard' },
+    { name: 'Project', href: '/projects' },
 ]
 
 interface GuestNavbarProps {

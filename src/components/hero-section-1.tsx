@@ -192,7 +192,7 @@ export function HeroSection() {
 
 const menuItems = [
     { name: 'Siswa', href: '/siswa' },
-    { name: 'Project', href: '/dashboard' },
+    { name: 'Project', href: '/projects' },
 ]
 
 const HeroHeader = () => {
