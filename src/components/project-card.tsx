@@ -167,33 +167,33 @@ export function ProjectCard(props: ProjectCardProps) {
           )}
 
           {/* Tech Stacks */}
-          {('projectTechstacks' in project ? project.projectTechstacks : project.techstacks) && 
-           ('projectTechstacks' in project ? project.projectTechstacks : project.techstacks).length > 0 && (
+          {(('techstacks' in project && project.techstacks) || ('projectTechstacks' in project && project.projectTechstacks)) && 
+           (('techstacks' in project && project.techstacks?.length > 0) || ('projectTechstacks' in project && project.projectTechstacks?.length > 0)) && (
             <div className="space-y-2">
               <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 Tech Stack
               </h4>
               <div className="flex flex-wrap gap-1.5">
-                {('projectTechstacks' in project ? project.projectTechstacks : project.techstacks)
+                {(('techstacks' in project ? project.techstacks : project.projectTechstacks) || [])
                   .slice(0, 4)
-                  .filter((pt: any) => pt.techstack || pt.name)
-                  .map((pt: any) => (
+                  .filter((pt: any) => pt.techstack && pt.techstack.name)
+                  .map((pt: any, index: number) => (
                     <Badge 
-                      key={pt.id} 
+                      key={pt.techstack?.id || `techstack-${index}`} 
                       variant="outline" 
                       className="text-xs font-medium px-2.5 py-1 border-border/60"
                       style={{
-                        backgroundColor: ('projectTechstacks' in project ? pt.techstack?.bgHex : pt.bgHex) || undefined,
-                        borderColor: ('projectTechstacks' in project ? pt.techstack?.borderHex : pt.borderHex) || undefined,
-                        color: ('projectTechstacks' in project ? pt.techstack?.textHex : pt.textHex) || undefined,
+                        backgroundColor: pt.techstack?.bgHex || undefined,
+                        borderColor: pt.techstack?.borderHex || undefined,
+                        color: pt.techstack?.textHex || undefined,
                       }}
                     >
-                      {'projectTechstacks' in project ? pt.techstack?.name : pt.name}
+                      {pt.techstack?.name}
                     </Badge>
                   ))}
-                {('projectTechstacks' in project ? project.projectTechstacks : project.techstacks).length > 4 && (
+                {(('techstacks' in project ? project.techstacks : project.projectTechstacks) || []).length > 4 && (
                   <Badge variant="outline" className="text-xs font-medium px-2.5 py-1 text-muted-foreground">
-                    +{('projectTechstacks' in project ? project.projectTechstacks : project.techstacks).length - 4}
+                    +{(('techstacks' in project ? project.techstacks : project.projectTechstacks) || []).length - 4}
                   </Badge>
                 )}
               </div>
@@ -208,8 +208,8 @@ export function ProjectCard(props: ProjectCardProps) {
                 Media ({('projectMedia' in project ? project.projectMedia : project.media).length})
               </h4>
               <div className="flex gap-2">
-                {('projectMedia' in project ? project.projectMedia : project.media).slice(0, 4).map((media: any) => (
-                  <div key={media.id} className="w-10 h-10 rounded-md overflow-hidden bg-muted border border-border/50">
+                {('projectMedia' in project ? project.projectMedia : project.media).slice(0, 4).map((media: any, index: number) => (
+                  <div key={media.id || `media-${index}`} className="w-10 h-10 rounded-md overflow-hidden bg-muted border border-border/50">
                     {media.mediaType === 'image' ? (
                       <img 
                         src={media.mediaUrl} 

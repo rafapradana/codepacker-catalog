@@ -23,12 +23,15 @@ interface Student {
   class: {
     name: string
   } | null
-  skills: Array<{
-    id: string
-    name: string
-    bgHex: string
-    borderHex: string
-    textHex: string
+  studentSkills: Array<{
+    skill: {
+      id: string
+      name: string
+      iconUrl: string | null
+      bgHex: string
+      borderHex: string
+      textHex: string
+    }
   }>
   projects: Array<{
     id: string
@@ -197,7 +200,7 @@ export default function ProfilePage() {
                 <div className="text-sm text-muted-foreground">projects</div>
               </div>
               <div className="text-center">
-                <div className="font-semibold text-lg text-foreground">{student.skills?.length || 0}</div>
+                <div className="font-semibold text-lg text-foreground">{student.studentSkills?.length || 0}</div>
                 <div className="text-sm text-muted-foreground">skills</div>
               </div>
             </div>
@@ -221,21 +224,28 @@ export default function ProfilePage() {
                 )}
                 
                 {/* Skills Section - Moved here */}
-                {student.skills && student.skills.length > 0 && (
+                {student.studentSkills && student.studentSkills.length > 0 && (
                   <div className="mt-2">
                     <div className="flex flex-wrap justify-center sm:justify-start gap-2">
-                      {student.skills.map((skill) => (
+                      {student.studentSkills.map((skillItem) => (
                         <Badge
-                          key={skill.id}
+                          key={skillItem.skill.id}
                           variant="secondary"
-                          className="px-3 py-1.5 text-xs font-medium"
+                          className="px-3 py-1.5 text-xs font-medium flex items-center gap-1.5"
                           style={{
-                            backgroundColor: skill.bgHex || undefined,
-                            borderColor: skill.borderHex || undefined,
-                            color: skill.textHex || undefined,
+                            backgroundColor: skillItem.skill.bgHex || undefined,
+                            borderColor: skillItem.skill.borderHex || undefined,
+                            color: skillItem.skill.textHex || undefined,
                           }}
                         >
-                          {skill.name}
+                          {skillItem.skill.iconUrl && (
+                            <img 
+                              src={skillItem.skill.iconUrl} 
+                              alt={skillItem.skill.name}
+                              className="w-3 h-3"
+                            />
+                          )}
+                          {skillItem.skill.name}
                         </Badge>
                       ))}
                     </div>

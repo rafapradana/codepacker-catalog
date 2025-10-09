@@ -123,7 +123,7 @@ export function ProjectsDataTable() {
 
         if (projectsRes.ok) {
           const projectsData = await projectsRes.json()
-          setProjects(projectsData)
+          setProjects(projectsData.projects || [])
         }
 
         if (studentsRes.ok) {

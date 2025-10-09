@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useState, useEffect } from "react"
 import {
   IconDashboard,
   IconSchool,
@@ -87,6 +88,11 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { theme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
   
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -100,7 +106,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <a href="/admin/dashboard" className="flex items-center gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
                   <Image 
-                    src={theme === 'dark' ? "/images/logos/codepacker-black.svg" : "/images/logos/codepacker-white.svg"}
+                    src={mounted && theme === 'dark' ? "/images/logos/codepacker-black.svg" : "/images/logos/codepacker-white.svg"}
                     alt="CodePacker Logo" 
                     width={20} 
                     height={20}

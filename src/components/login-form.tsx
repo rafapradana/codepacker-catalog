@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { z } from "zod"
 import { cn } from "@/lib/utils"
@@ -36,6 +36,11 @@ export function LoginForm({
   const [errors, setErrors] = useState<Partial<Record<keyof LoginFormData, string[]>>>({})
   const [isLoading, setIsLoading] = useState(false)
   const [loginError, setLoginError] = useState<string>("")
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleInputChange = (field: keyof LoginFormData) => (
     e: React.ChangeEvent<HTMLInputElement>
@@ -126,7 +131,7 @@ export function LoginForm({
       <div className="flex flex-col items-center gap-2 text-center">
         <div className="mb-4">
           <Image
-            src={theme === 'dark' ? '/images/logos/codepacker-white.svg' : '/images/logos/codepacker-black.svg'}
+            src={mounted && theme === 'dark' ? '/images/logos/codepacker-white.svg' : '/images/logos/codepacker-black.svg'}
             alt="CodePacker Catalog"
             width={120}
             height={40}
