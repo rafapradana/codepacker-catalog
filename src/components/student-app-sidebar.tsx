@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
 import Image from "next/image"
@@ -81,6 +81,11 @@ export function StudentSidebar({ currentPage, onPageChange }: StudentSidebarProp
   const router = useRouter()
   const pathname = usePathname()
   const { theme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleMenuClick = (item: typeof mainMenuItems[0] | typeof settingsMenuItem) => {
     onPageChange(item.label.toLowerCase())
@@ -100,7 +105,7 @@ export function StudentSidebar({ currentPage, onPageChange }: StudentSidebarProp
         {/* Logo at top */}
         <div className="flex justify-center py-4">
           <Image
-            src={theme === "dark" ? "/images/logos/codepacker-white.svg" : "/images/logos/codepacker-black.svg"}
+            src={mounted && theme === "dark" ? "/images/logos/codepacker-white.svg" : "/images/logos/codepacker-black.svg"}
             alt="CodePacker"
             width={32}
             height={32}

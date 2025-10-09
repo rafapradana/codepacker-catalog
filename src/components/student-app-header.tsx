@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 import Image from "next/image"
@@ -32,7 +33,12 @@ export function StudentHeader({ currentPage, onPageChange }: StudentHeaderProps)
   const pathname = usePathname()
   const router = useRouter()
   const { theme } = useTheme()
+  const [mounted, setMounted] = useState(false)
   const pageTitle = getPageTitle(pathname)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleSettingsClick = () => {
     onPageChange("pengaturan")
@@ -59,7 +65,7 @@ export function StudentHeader({ currentPage, onPageChange }: StudentHeaderProps)
           {/* Logo Left */}
           <div className="flex items-center">
             <Image
-              src={theme === "dark" ? "/images/logos/codepacker-white.svg" : "/images/logos/codepacker-black.svg"}
+              src={mounted && theme === "dark" ? "/images/logos/codepacker-white.svg" : "/images/logos/codepacker-black.svg"}
               alt="CodePacker"
               width={24}
               height={24}
