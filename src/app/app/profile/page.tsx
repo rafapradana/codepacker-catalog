@@ -275,6 +275,8 @@ export default function ProfilePage() {
                   project={project} 
                   hideStudentInfo={true}
                   isStudentApp={true}
+                  showEditButton={true}
+                  currentStudentId={student.id}
                 />
               ))}
             </div>

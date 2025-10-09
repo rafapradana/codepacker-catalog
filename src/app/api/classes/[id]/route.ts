@@ -3,10 +3,11 @@ import { getClassById, updateClass, deleteClass } from '@/lib/classes';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const classItem = await getClassById(params.id);
+    const { id } = await params;
+    const classItem = await getClassById(id);
     
     if (!classItem) {
       return NextResponse.json(
@@ -27,9 +28,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { name } = await request.json();
 
     if (!name || typeof name !== 'string' || !name.trim()) {
@@ -39,7 +41,7 @@ export async function PUT(
       );
     }
 
-    const updatedClass = await updateClass(params.id, name.trim());
+    const updatedClass = await updateClass(id, name.trim());
     
     if (!updatedClass) {
       return NextResponse.json(
@@ -60,10 +62,11 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const success = await deleteClass(params.id);
+    const { id } = await params;
+    const success = await deleteClass(id);
     
     if (!success) {
       return NextResponse.json(

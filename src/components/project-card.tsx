@@ -74,6 +74,8 @@ interface PublicProjectCardProps {
   }
   hideStudentInfo?: boolean // New prop to hide student info on profile pages
   isStudentApp?: boolean // New prop to determine routing context
+  showEditButton?: boolean // New prop to show edit button for student's own projects
+  currentStudentId?: string // New prop to check if current user owns the project
 }
 
 type ProjectCardProps = AdminProjectCardProps | PublicProjectCardProps
@@ -308,7 +310,7 @@ export function ProjectCard(props: ProjectCardProps) {
   }
   
   // Public version for projects page
-  const { hideStudentInfo = false, isStudentApp = false } = props
+  const { hideStudentInfo = false, isStudentApp = false, showEditButton = false, currentStudentId } = props
   
   // Determine the correct route based on context
   const projectDetailRoute = isStudentApp ? `/app/projects/${project.id}` : `/projects/${project.id}`
@@ -401,13 +403,29 @@ export function ProjectCard(props: ProjectCardProps) {
             </span>
           </div>
 
-          {/* Action Button - Full width "Lihat Detail" */}
-          <Link href={projectDetailRoute} className="block w-full">
-            <Button variant="default" size="sm" className="w-full h-8 text-xs font-medium">
-              <IconEye className="h-3 w-3 mr-1" />
-              Lihat Detail
-            </Button>
-          </Link>
+          {/* Action Button - Full width "Lihat Detail" or with Edit button */}
+          {showEditButton && currentStudentId === project.student?.id ? (
+            <div className="flex gap-2">
+              <Link href={projectDetailRoute} className="flex-1">
+                <Button variant="default" size="sm" className="w-full h-8 text-xs font-medium">
+                  <IconEye className="h-3 w-3 mr-1" />
+                  Lihat Detail
+                </Button>
+              </Link>
+              <Link href={`/app/projects/${project.id}/edit`}>
+                <Button variant="outline" size="sm" className="h-8 px-2 text-xs">
+                  <IconEdit className="h-3 w-3" />
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <Link href={projectDetailRoute} className="block w-full">
+              <Button variant="default" size="sm" className="w-full h-8 text-xs font-medium">
+                <IconEye className="h-3 w-3 mr-1" />
+                Lihat Detail
+              </Button>
+            </Link>
+          )}
         </div>
       </CardContent>
     </Card>

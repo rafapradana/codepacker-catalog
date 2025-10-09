@@ -7,11 +7,10 @@ import { eq, and } from 'drizzle-orm';
 // DELETE /api/projects/[id]/techstacks/[techstackId] - Remove a techstack from a project
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; techstackId: string } }
+  { params }: { params: Promise<{ id: string; techstackId: string }> }
 ) {
   try {
-    const projectId = params.id;
-    const techstackId = params.techstackId;
+    const { id: projectId, techstackId } = await params;
 
     // Validate UUIDs
     if (!z.string().uuid().safeParse(projectId).success) {

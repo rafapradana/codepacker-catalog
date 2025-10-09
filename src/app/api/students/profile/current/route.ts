@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
       .leftJoin(skills, eq(studentSkills.skillId, skills.id))
       .where(eq(studentSkills.studentId, student.id))
 
-    // Fetch student projects with categories and techstacks
+    // Fetch projects for the student
     const projectsResult = await db
       .select({
         id: projects.id,
@@ -76,7 +76,16 @@ export async function GET(request: NextRequest) {
         githubUrl: projects.githubUrl,
         liveDemoUrl: projects.liveDemoUrl,
         createdAt: projects.createdAt,
+        updatedAt: projects.updatedAt,
+        student: {
+          id: students.id,
+          fullName: students.fullName,
+          profilePhotoUrl: students.profilePhotoUrl,
+          classId: students.classId,
+          className: classes.name,
+        },
         category: {
+          id: categories.id,
           name: categories.name,
           bgHex: categories.bgHex,
           borderHex: categories.borderHex,
@@ -84,6 +93,8 @@ export async function GET(request: NextRequest) {
         },
       })
       .from(projects)
+      .leftJoin(students, eq(projects.studentId, students.id))
+      .leftJoin(classes, eq(students.classId, classes.id))
       .leftJoin(categories, eq(projects.categoryId, categories.id))
       .where(eq(projects.studentId, student.id))
       .orderBy(desc(projects.createdAt))

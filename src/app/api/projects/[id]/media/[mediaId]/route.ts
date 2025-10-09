@@ -7,11 +7,10 @@ import { eq, and } from 'drizzle-orm';
 // DELETE /api/projects/[id]/media/[mediaId] - Delete a specific media from a project
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; mediaId: string } }
+  { params }: { params: Promise<{ id: string; mediaId: string }> }
 ) {
   try {
-    const projectId = params.id;
-    const mediaId = params.mediaId;
+    const { id: projectId, mediaId } = await params;
 
     // Validate UUIDs
     if (!z.string().uuid().safeParse(projectId).success) {

@@ -15,10 +15,10 @@ const createProjectMediaDirectSchema = z.object({
 // POST /api/projects/[id]/media/direct - Add media to a project directly (without file upload)
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const projectId = params.id;
+    const { id: projectId } = await params;
     const body = await request.json();
 
     // Validate UUID

@@ -13,10 +13,11 @@ const idSchema = z.string().uuid('ID kategori tidak valid');
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const validatedId = idSchema.parse(params.id);
+    const { id } = await params;
+    const validatedId = idSchema.parse(id);
     
     const category = await getCategoryById(validatedId);
     
@@ -46,10 +47,11 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const validatedId = idSchema.parse(params.id);
+    const { id } = await params;
+    const validatedId = idSchema.parse(id);
     const body = await request.json();
     
     // Validate request body with Zod
@@ -98,10 +100,11 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const validatedId = idSchema.parse(params.id);
+    const { id } = await params;
+    const validatedId = idSchema.parse(id);
     
     // Check if category exists
     const existingCategory = await getCategoryById(validatedId);

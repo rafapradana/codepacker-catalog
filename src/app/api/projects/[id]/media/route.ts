@@ -14,10 +14,10 @@ const createProjectMediaSchema = z.object({
 // GET /api/projects/[id]/media - Get all media for a project
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const projectId = params.id;
+    const { id: projectId } = await params;
 
     // Validate UUID
     if (!z.string().uuid().safeParse(projectId).success) {
@@ -61,10 +61,10 @@ export async function GET(
 // POST /api/projects/[id]/media - Add media to a project via file upload
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const projectId = params.id;
+    const { id: projectId } = await params;
     const formData = await request.formData();
     
     const file = formData.get('file') as File;

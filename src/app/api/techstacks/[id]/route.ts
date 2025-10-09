@@ -12,10 +12,11 @@ const updateTechStackSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const techstack = await getTechStackById(params.id);
+    const { id } = await params;
+    const techstack = await getTechStackById(id);
     
     if (!techstack) {
       return NextResponse.json(
@@ -36,15 +37,16 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     
     // Validate request body
     const validatedData = updateTechStackSchema.parse(body);
     
-    const techstack = await updateTechStack(params.id, validatedData);
+    const techstack = await updateTechStack(id, validatedData);
     
     if (!techstack) {
       return NextResponse.json(
@@ -79,10 +81,11 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const success = await deleteTechStack(params.id);
+    const { id } = await params;
+    const success = await deleteTechStack(id);
     
     if (!success) {
       return NextResponse.json(

@@ -18,10 +18,10 @@ const updateProjectSchema = z.object({
 // GET /api/projects/[id] - Get a specific project with all relations
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const projectId = params.id;
+    const { id: projectId } = await params;
 
     // Validate UUID
     if (!z.string().uuid().safeParse(projectId).success) {
@@ -42,6 +42,8 @@ export async function GET(
         liveDemoUrl: projects.liveDemoUrl,
         createdAt: projects.createdAt,
         updatedAt: projects.updatedAt,
+        studentId: projects.studentId, // Add studentId for ownership validation
+        categoryId: projects.categoryId, // Add categoryId for form population
         student: {
           id: students.id,
           fullName: students.fullName,
@@ -77,6 +79,7 @@ export async function GET(
     const projectTechstacksList = await db
       .select({
         id: projectTechstacks.id,
+        techstackId: projectTechstacks.techstackId, // Add techstackId for form population
         techstack: {
           id: techstacks.id,
           name: techstacks.name,
@@ -98,8 +101,8 @@ export async function GET(
 
     const result = {
       ...project,
-      techstacks: projectTechstacksList,
-      media: projectMediaList,
+      projectTechstacks: projectTechstacksList, // Use projectTechstacks instead of techstacks
+      projectMedia: projectMediaList, // Use projectMedia instead of media
     };
 
     return NextResponse.json(result);
@@ -115,11 +118,10 @@ export async function GET(
 // PUT /api/projects/[id] - Update a project
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const projectId = params.id;
-    const body = await request.json();
+    const { id: projectId } = await params;
 
     // Validate UUID
     if (!z.string().uuid().safeParse(projectId).success) {
@@ -129,89 +131,212 @@ export async function PUT(
       );
     }
 
-    // Validate request body
-    const validatedData = updateProjectSchema.parse(body);
+    // Check if request is FormData (for file uploads) or JSON
+    const contentType = request.headers.get('content-type');
+    const isFormData = contentType?.includes('multipart/form-data');
 
-    // Check if project exists
-    const existingProject = await db
-      .select({ id: projects.id })
-      .from(projects)
-      .where(eq(projects.id, projectId))
-      .limit(1);
+    if (isFormData) {
+      // Handle FormData for file uploads
+      const formData = await request.formData();
+      
+      const title = formData.get('title') as string;
+      const description = formData.get('description') as string;
+      const githubUrl = formData.get('githubUrl') as string;
+      const liveDemoUrl = formData.get('liveDemoUrl') as string;
+      const categoryId = formData.get('categoryId') as string;
+      const techstackIdsString = formData.get('techstackIds') as string;
+      
+      // Parse techstack IDs
+      let techstackIds: string[] = [];
+      try {
+        techstackIds = JSON.parse(techstackIdsString || '[]');
+      } catch (error) {
+        return NextResponse.json({ error: 'Invalid techstack IDs format' }, { status: 400 });
+      }
 
-    if (existingProject.length === 0) {
-      return NextResponse.json(
-        { error: 'Project not found' },
-        { status: 404 }
-      );
-    }
+      // Validate required fields
+      if (!title?.trim()) {
+        return NextResponse.json({ error: 'Title is required' }, { status: 400 });
+      }
 
-    // Verify student exists if provided
-    if (validatedData.studentId) {
-      const student = await db
-        .select({ id: students.id })
-        .from(students)
-        .where(eq(students.id, validatedData.studentId))
+      if (!categoryId) {
+        return NextResponse.json({ error: 'Category is required' }, { status: 400 });
+      }
+
+      if (techstackIds.length === 0) {
+        return NextResponse.json({ error: 'At least one techstack is required' }, { status: 400 });
+      }
+
+      // Check if project exists
+      const existingProject = await db
+        .select({ 
+          id: projects.id,
+          thumbnailUrl: projects.thumbnailUrl,
+          studentId: projects.studentId
+        })
+        .from(projects)
+        .where(eq(projects.id, projectId))
         .limit(1);
 
-      if (student.length === 0) {
+      if (existingProject.length === 0) {
+        return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+      }
+
+      // Handle file uploads
+      let thumbnailUrl = existingProject[0].thumbnailUrl;
+      const mediaUrls: string[] = [];
+
+      // Handle thumbnail upload
+      const thumbnailFile = formData.get('thumbnail') as File;
+      if (thumbnailFile && thumbnailFile.size > 0) {
+        // In a real app, you'd upload to cloud storage
+        // For now, we'll just use a placeholder URL
+        thumbnailUrl = `/uploads/projects/thumbnail-${Date.now()}.jpg`;
+      }
+
+      // Handle media uploads
+      const mediaFiles: File[] = [];
+      for (const [key, value] of formData.entries()) {
+        if (key.startsWith('media_') && value instanceof File && value.size > 0) {
+          mediaFiles.push(value);
+        }
+      }
+
+      for (const mediaFile of mediaFiles) {
+        // In a real app, you'd upload to cloud storage
+        mediaUrls.push(`/uploads/projects/media-${Date.now()}-${Math.random()}.jpg`);
+      }
+
+      // Update project in database transaction
+      await db.transaction(async (tx) => {
+        // Update project basic info
+        await tx
+          .update(projects)
+          .set({
+            title: title.trim(),
+            description: description?.trim() || undefined,
+             githubUrl: githubUrl?.trim() || undefined,
+             liveDemoUrl: liveDemoUrl?.trim() || undefined,
+            categoryId,
+            thumbnailUrl,
+            updatedAt: new Date(),
+          })
+          .where(eq(projects.id, projectId));
+
+        // Update techstacks - remove old ones and add new ones
+        await tx.delete(projectTechstacks).where(eq(projectTechstacks.projectId, projectId));
+
+        if (techstackIds.length > 0) {
+          await tx.insert(projectTechstacks).values(
+            techstackIds.map(techstackId => ({
+              projectId,
+              techstackId,
+            }))
+          );
+        }
+
+        // Add new media files (keep existing ones)
+         if (mediaUrls.length > 0) {
+           await tx.insert(projectMedia).values(
+             mediaUrls.map(mediaUrl => ({
+               projectId,
+               mediaUrl,
+               mediaType: 'image', // Default to image type
+             }))
+           );
+         }
+      });
+
+      // Fetch updated project with relations
+      const result = await GET(request, { params });
+      return result;
+
+    } else {
+      // Handle JSON for simple updates (backward compatibility)
+      const body = await request.json();
+      const validatedData = updateProjectSchema.parse(body);
+
+      // Check if project exists
+      const existingProject = await db
+        .select({ id: projects.id })
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .limit(1);
+
+      if (existingProject.length === 0) {
         return NextResponse.json(
-          { error: 'Student not found' },
+          { error: 'Project not found' },
           { status: 404 }
         );
       }
-    }
 
-    // Verify category exists if provided
-    if (validatedData.categoryId) {
-      const category = await db
-        .select({ id: categories.id })
-        .from(categories)
-        .where(eq(categories.id, validatedData.categoryId))
-        .limit(1);
+      // Verify student exists if provided
+      if (validatedData.studentId) {
+        const student = await db
+          .select({ id: students.id })
+          .from(students)
+          .where(eq(students.id, validatedData.studentId))
+          .limit(1);
 
-      if (category.length === 0) {
-        return NextResponse.json(
-          { error: 'Category not found' },
-          { status: 404 }
-        );
+        if (student.length === 0) {
+          return NextResponse.json(
+            { error: 'Student not found' },
+            { status: 404 }
+          );
+        }
       }
-    }
 
-    // Update the project
-    const [updatedProject] = await db
-      .update(projects)
-      .set({
-        ...validatedData,
-        updatedAt: new Date(),
-      })
-      .where(eq(projects.id, projectId))
-      .returning();
+      // Verify category exists if provided
+       if (validatedData.categoryId) {
+         const category = await db
+           .select({ id: categories.id })
+           .from(categories)
+           .where(eq(categories.id, validatedData.categoryId))
+           .limit(1);
 
-    return NextResponse.json(updatedProject);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Validation failed', details: error.issues },
-        { status: 400 }
-      );
-    }
+         if (category.length === 0) {
+           return NextResponse.json(
+             { error: 'Category not found' },
+             { status: 404 }
+           );
+         }
+       }
 
-    console.error('Error updating project:', error);
-    return NextResponse.json(
-      { error: 'Failed to update project' },
-      { status: 500 }
-    );
-  }
+       // Update the project
+       const [updatedProject] = await db
+         .update(projects)
+         .set({
+           ...validatedData,
+           updatedAt: new Date(),
+         })
+         .where(eq(projects.id, projectId))
+         .returning();
+
+       return NextResponse.json(updatedProject);
+     }
+   } catch (error) {
+     if (error instanceof z.ZodError) {
+       return NextResponse.json(
+         { error: 'Validation failed', details: error.issues },
+         { status: 400 }
+       );
+     }
+
+     console.error('Error updating project:', error);
+     return NextResponse.json(
+       { error: 'Failed to update project' },
+       { status: 500 }
+     );
+   }
 }
 
 // DELETE /api/projects/[id] - Delete a project
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const projectId = params.id;
+    const { id: projectId } = await params;
 
     // Validate UUID
     if (!z.string().uuid().safeParse(projectId).success) {

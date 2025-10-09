@@ -12,10 +12,11 @@ const removeSkillSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const skills = await getStudentSkills(params.id)
+    const { id } = await params;
+    const skills = await getStudentSkills(id)
     return NextResponse.json(skills)
   } catch (error) {
     console.error("Error fetching student skills:", error)
@@ -28,14 +29,15 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json()
     
     const validatedData = addSkillSchema.parse(body)
     
-    const result = await addStudentSkill(params.id, validatedData.skillId)
+    const result = await addStudentSkill(id, validatedData.skillId)
     
     if (!result.success) {
       return NextResponse.json(
@@ -63,14 +65,15 @@ export async function POST(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json()
     
     const validatedData = removeSkillSchema.parse(body)
     
-    const result = await removeStudentSkill(params.id, validatedData.skillId)
+    const result = await removeStudentSkill(id, validatedData.skillId)
     
     if (!result.success) {
       return NextResponse.json(

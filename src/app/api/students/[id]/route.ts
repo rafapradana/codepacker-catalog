@@ -16,10 +16,11 @@ const updateStudentSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const student = await getStudentById(params.id)
+    const { id } = await params;
+    const student = await getStudentById(id)
     
     if (!student) {
       return NextResponse.json(
@@ -40,14 +41,15 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json()
     
     const validatedData = updateStudentSchema.parse(body)
     
-    const student = await updateStudent(params.id, validatedData)
+    const student = await updateStudent(id, validatedData)
     
     if (!student) {
       return NextResponse.json(
@@ -75,10 +77,11 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const success = await deleteStudent(params.id)
+    const { id } = await params;
+    const success = await deleteStudent(id)
     
     if (!success) {
       return NextResponse.json(

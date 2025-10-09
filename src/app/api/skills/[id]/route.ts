@@ -12,10 +12,11 @@ const updateSkillSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const skill = await getSkillById(params.id);
+    const { id } = await params;
+    const skill = await getSkillById(id);
     
     if (!skill) {
       return NextResponse.json(
@@ -36,15 +37,16 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     
     // Validate request body
     const validatedData = updateSkillSchema.parse(body);
     
-    const skill = await updateSkill(params.id, validatedData);
+    const skill = await updateSkill(id, validatedData);
     
     if (!skill) {
       return NextResponse.json(
@@ -79,10 +81,11 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const success = await deleteSkill(params.id);
+    const { id } = await params;
+    const success = await deleteSkill(id);
     
     if (!success) {
       return NextResponse.json(

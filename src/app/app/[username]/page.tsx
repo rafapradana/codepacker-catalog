@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Github, Linkedin, Calendar, MapPin } from 'lucide-react'
 import { ProjectCard } from '@/components/project-card'
+import { getStudentSession } from "@/lib/session"
 
 interface Student {
   id: string
@@ -65,10 +66,17 @@ export default function StudentProfilePage() {
   const params = useParams()
   const username = params.username as string
   const [student, setStudent] = useState<Student | null>(null)
+  const [currentStudentId, setCurrentStudentId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    // Get current logged in student
+    const session = getStudentSession()
+    if (session) {
+      setCurrentStudentId(session.id)
+    }
+
     const fetchStudent = async () => {
       try {
         const response = await fetch(`/api/students/profile/${username}`)
@@ -260,6 +268,8 @@ export default function StudentProfilePage() {
                     projectMedia: [], // Empty array since API doesn't return projectMedia
                   }}
                   hideStudentInfo={true} // Hide student info on their own profile page
+                  showEditButton={currentStudentId === student.id}
+                  currentStudentId={currentStudentId || undefined}
                 />
               ))}
             </div>
