@@ -73,6 +73,7 @@ interface PublicProjectCardProps {
     }>
   }
   hideStudentInfo?: boolean // New prop to hide student info on profile pages
+  isStudentApp?: boolean // New prop to determine routing context
 }
 
 type ProjectCardProps = AdminProjectCardProps | PublicProjectCardProps
@@ -307,7 +308,11 @@ export function ProjectCard(props: ProjectCardProps) {
   }
   
   // Public version for projects page
-  const { hideStudentInfo = false } = props
+  const { hideStudentInfo = false, isStudentApp = false } = props
+  
+  // Determine the correct route based on context
+  const projectDetailRoute = isStudentApp ? `/app/projects/${project.id}` : `/projects/${project.id}`
+  
   return (
     <Card className="group relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 border-border/50 h-full flex flex-col py-0">
       {/* Thumbnail Section */}
@@ -397,7 +402,7 @@ export function ProjectCard(props: ProjectCardProps) {
           </div>
 
           {/* Action Button - Full width "Lihat Detail" */}
-          <Link href={`/projects/${project.id}`} className="block w-full">
+          <Link href={projectDetailRoute} className="block w-full">
             <Button variant="default" size="sm" className="w-full h-8 text-xs font-medium">
               <IconEye className="h-3 w-3 mr-1" />
               Lihat Detail

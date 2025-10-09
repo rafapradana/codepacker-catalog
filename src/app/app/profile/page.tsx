@@ -274,6 +274,7 @@ export default function ProfilePage() {
                   key={project.id} 
                   project={project} 
                   hideStudentInfo={true}
+                  isStudentApp={true}
                 />
               ))}
             </div>
