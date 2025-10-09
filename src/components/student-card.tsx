@@ -32,10 +32,16 @@ interface StudentCardProps {
       textHex: string
     }[]
   }
+  isStudentApp?: boolean // New prop to determine routing context
 }
 
-export function StudentCard({ student }: StudentCardProps) {
+export function StudentCard({ student, isStudentApp = false }: StudentCardProps) {
   const displayedSkills = student.skills.slice(0, 4)
+
+  // Determine the profile URL based on context
+  const profileUrl = isStudentApp 
+    ? `/app/${student.user?.username || student.id}` 
+    : `/${student.user?.username || student.id}`
 
   return (
     <Card className="group relative overflow-hidden bg-card border border-border hover:shadow-lg transition-all duration-300 ease-out">
@@ -145,7 +151,7 @@ export function StudentCard({ student }: StudentCardProps) {
           size="sm"
           className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-all duration-200"
         >
-          <Link href={`/${student.user?.username || student.id}`}>
+          <Link href={profileUrl}>
             Lihat Profil
           </Link>
         </Button>
