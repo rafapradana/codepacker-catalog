@@ -76,6 +76,7 @@ interface PublicProjectCardProps {
   isStudentApp?: boolean // New prop to determine routing context
   showEditButton?: boolean // New prop to show edit button for student's own projects
   currentStudentId?: string // New prop to check if current user owns the project
+  onDelete?: (projectId: string) => void // New prop for delete functionality
 }
 
 type ProjectCardProps = AdminProjectCardProps | PublicProjectCardProps
@@ -310,7 +311,7 @@ export function ProjectCard(props: ProjectCardProps) {
   }
   
   // Public version for projects page
-  const { hideStudentInfo = false, isStudentApp = false, showEditButton = false, currentStudentId } = props
+  const { hideStudentInfo = false, isStudentApp = false, showEditButton = false, currentStudentId, onDelete } = props
   
   // Determine the correct route based on context
   const projectDetailRoute = isStudentApp ? `/app/projects/${project.id}` : `/projects/${project.id}`
@@ -417,6 +418,36 @@ export function ProjectCard(props: ProjectCardProps) {
                   <IconEdit className="h-3 w-3" />
                 </Button>
               </Link>
+              {onDelete && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 px-2 text-xs text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20"
+                    >
+                      <IconTrash className="h-3 w-3" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Hapus Project</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Apakah Anda yakin ingin menghapus "{project.title}"? Tindakan ini tidak dapat dibatalkan.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Batal</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => onDelete(project.id)}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Hapus
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
             </div>
           ) : (
             <Link href={projectDetailRoute} className="block w-full">

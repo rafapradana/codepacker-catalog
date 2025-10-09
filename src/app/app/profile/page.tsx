@@ -80,6 +80,38 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const handleDeleteProject = async (projectId: string) => {
+    try {
+      const session = getStudentSession()
+      if (!session) {
+        alert('Not logged in')
+        return
+      }
+
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.id}`
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete project')
+      }
+
+      // Remove the project from the state
+      setStudent(prev => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          projects: prev.projects.filter(project => project.id !== projectId)
+        }
+      })
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to delete project')
+    }
+  }
+
   useEffect(() => {
     const fetchStudentProfile = async () => {
       try {
@@ -277,6 +309,7 @@ export default function ProfilePage() {
                   isStudentApp={true}
                   showEditButton={true}
                   currentStudentId={student.id}
+                  onDelete={handleDeleteProject}
                 />
               ))}
             </div>
