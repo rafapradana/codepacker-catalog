@@ -76,6 +76,7 @@ export function StudentHeader({ currentPage, onPageChange }: StudentHeaderProps)
                       ? "text-foreground"
                       : "text-muted-foreground hover:text-foreground"
                   )}
+                  suppressHydrationWarning
                 >
                   {isSettingsActive ? (
                     <SettingsIcon size={20} />

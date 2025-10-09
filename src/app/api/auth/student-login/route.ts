@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { users, students } from "@/lib/schema"
+import { users, students, classes } from "@/lib/schema"
 import { eq } from "drizzle-orm"
 import bcrypt from "bcryptjs"
 
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Find user by email and join with student data
+    // Find user by email and join with student data and class data
     const result = await db
       .select({
         id: users.id,
@@ -31,10 +31,13 @@ export async function POST(request: NextRequest) {
         githubUrl: students.githubUrl,
         linkedinUrl: students.linkedinUrl,
         classId: students.classId,
+        className: classes.name,
+        studentId: students.id,
         passwordHash: users.passwordHash
       })
       .from(users)
       .leftJoin(students, eq(users.id, students.userId))
+      .leftJoin(classes, eq(students.classId, classes.id))
       .where(eq(users.email, email))
       .limit(1)
 

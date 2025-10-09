@@ -5,6 +5,7 @@ export interface StudentSession {
   name: string;
   studentId: string;
   className: string;
+  profilePhotoUrl: string;
   loginTime: string;
 }
 

@@ -134,6 +134,7 @@ export function StudentSidebar({ currentPage, onPageChange }: StudentSidebarProp
                         ? "text-foreground"
                         : "text-muted-foreground hover:text-foreground"
                     )}
+                    suppressHydrationWarning
                   >
                     <IconComponent 
                       size={20} 

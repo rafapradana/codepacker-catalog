@@ -103,6 +103,7 @@ export function LoginForm({
             name: result.user.name,
             studentId: result.user.studentId || '',
             className: result.user.className || '',
+            profilePhotoUrl: result.user.profilePhotoUrl || '',
             loginTime: new Date().toISOString()
           }
           saveStudentSession(sessionData)
