@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import React, { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -32,10 +32,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
-import { IconPlus, IconEdit, IconTrash, IconUpload, IconX } from "@tabler/icons-react"
+import { IconPlus, IconEdit, IconTrash, IconUpload, IconX, IconSearch, IconChevronDown } from "@tabler/icons-react"
 import { toast } from "sonner"
 import { TechStack } from "@/lib/techstacks"
+
+type SortOption = "updated-desc" | "updated-asc" | "created-desc" | "created-asc" | "name-asc" | "name-desc"
 
 interface TechStacksDataTableProps {
   data: TechStack[]
@@ -47,6 +55,8 @@ export function TechStacksDataTable({ data: initialData }: TechStacksDataTablePr
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [editingTechStack, setEditingTechStack] = useState<TechStack | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [sortBy, setSortBy] = useState<SortOption>("updated-desc")
   const [formData, setFormData] = useState({
     name: "",
     bgHex: "#ffffff",
@@ -83,6 +93,46 @@ export function TechStacksDataTable({ data: initialData }: TechStacksDataTablePr
         return
       }
       setSelectedFile(file)
+    }
+  }
+
+  // Filter and sort techstacks
+  const filteredTechstacks = React.useMemo(() => {
+    return data.filter(techstack =>
+      techstack.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  }, [data, searchQuery])
+
+  const sortedTechstacks = React.useMemo(() => {
+    const sorted = [...filteredTechstacks]
+    
+    switch (sortBy) {
+      case "name-asc":
+        return sorted.sort((a, b) => (a.name || "").localeCompare(b.name || ""))
+      case "name-desc":
+        return sorted.sort((a, b) => (b.name || "").localeCompare(a.name || ""))
+      case "created-asc":
+        return sorted.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+      case "created-desc":
+        return sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      case "updated-asc":
+        return sorted.sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime())
+      case "updated-desc":
+        return sorted.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      default:
+        return sorted
+    }
+  }, [filteredTechstacks, sortBy])
+
+  const getSortLabel = (sortOption: SortOption): string => {
+    switch (sortOption) {
+      case "updated-desc": return "Tanggal Diperbarui (Baru)"
+      case "updated-asc": return "Tanggal Diperbarui (Lama)"
+      case "created-desc": return "Tanggal Dibuat (Baru)"
+      case "created-asc": return "Tanggal Dibuat (Lama)"
+      case "name-asc": return "Nama (A-Z)"
+      case "name-desc": return "Nama (Z-A)"
+      default: return "Tanggal Diperbarui (Baru)"
     }
   }
 
@@ -373,11 +423,53 @@ export function TechStacksDataTable({ data: initialData }: TechStacksDataTablePr
           </Dialog>
         </div>
       </div>
-      {data.length === 0 ? (
+      
+      {/* Search and Sort Controls */}
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <div className="relative flex-1">
+          <IconSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            placeholder="Cari tech stack..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="min-w-[200px] justify-between">
+              {getSortLabel(sortBy)}
+              <IconChevronDown className="ml-2 h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-[200px]">
+            <DropdownMenuItem onClick={() => setSortBy("updated-desc")}>
+              Tanggal Diperbarui (Baru)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("updated-asc")}>
+              Tanggal Diperbarui (Lama)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("created-desc")}>
+              Tanggal Dibuat (Baru)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("created-asc")}>
+              Tanggal Dibuat (Lama)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("name-asc")}>
+              Nama (A-Z)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("name-desc")}>
+              Nama (Z-A)
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      
+      {sortedTechstacks.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-muted-foreground">No tech stacks found.</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Create your first tech stack to get started.
+            <p className="text-muted-foreground">
+              {searchQuery ? "Tidak ada tech stack yang sesuai dengan pencarian." : "Belum ada tech stack. Tambahkan tech stack pertama Anda."}
             </p>
           </div>
         ) : (
@@ -392,7 +484,7 @@ export function TechStacksDataTable({ data: initialData }: TechStacksDataTablePr
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map((techstack) => (
+              {sortedTechstacks.map((techstack) => (
                 <TableRow key={techstack.id}>
                   <TableCell className="font-medium">{techstack.name}</TableCell>
                   <TableCell>

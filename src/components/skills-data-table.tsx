@@ -33,9 +33,17 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
-import { IconPlus, IconEdit, IconTrash, IconUpload, IconX } from "@tabler/icons-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { IconPlus, IconEdit, IconTrash, IconUpload, IconX, IconSearch, IconChevronDown } from "@tabler/icons-react"
 import { toast } from "sonner"
 import { Skill } from "@/lib/skills"
+
+type SortOption = "updated-desc" | "updated-asc" | "created-desc" | "created-asc" | "name-asc" | "name-desc"
 
 interface SkillsDataTableProps {
   data: Skill[]
@@ -47,6 +55,11 @@ export function SkillsDataTable({ data: initialData }: SkillsDataTableProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [editingSkill, setEditingSkill] = useState<Skill | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  
+  // Search and sort state
+  const [searchQuery, setSearchQuery] = useState("")
+  const [sortBy, setSortBy] = useState<SortOption>("updated-desc")
+  
   const [formData, setFormData] = useState({
     name: "",
     bgHex: "#ffffff",
@@ -66,6 +79,43 @@ export function SkillsDataTable({ data: initialData }: SkillsDataTableProps) {
     setSelectedFile(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
+    }
+  }
+
+  // Filter and sort skills
+  const filteredSkills = data.filter(skill => {
+    if (!searchQuery) return true
+    
+    const query = searchQuery.toLowerCase()
+    return skill.name.toLowerCase().includes(query)
+  })
+
+  const sortedSkills = [...filteredSkills].sort((a, b) => {
+    switch (sortBy) {
+      case "name-asc":
+        return a.name.localeCompare(b.name)
+      case "name-desc":
+        return b.name.localeCompare(a.name)
+      case "created-asc":
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      case "created-desc":
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      case "updated-asc":
+        return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+      case "updated-desc":
+      default:
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    }
+  })
+
+  const getSortLabel = (option: SortOption) => {
+    switch (option) {
+      case "name-asc": return "Nama (A-Z)"
+      case "name-desc": return "Nama (Z-A)"
+      case "created-asc": return "Tanggal Dibuat (Lama)"
+      case "created-desc": return "Tanggal Dibuat (Baru)"
+      case "updated-asc": return "Tanggal Diperbarui (Lama)"
+      case "updated-desc": return "Tanggal Diperbarui (Baru)"
     }
   }
 
@@ -262,7 +312,7 @@ export function SkillsDataTable({ data: initialData }: SkillsDataTableProps) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Kelola Skill</h1>
           <p className="text-muted-foreground">
@@ -270,34 +320,34 @@ export function SkillsDataTable({ data: initialData }: SkillsDataTableProps) {
           </p>
         </div>
         <div>
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button onClick={resetForm}>
-                  <IconPlus className="mr-2 h-4 w-4" />
-                  Add Skill
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Add New Skill</DialogTitle>
-                  <DialogDescription>
-                    Create a new skill with custom styling and optional icon.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="name">Name</Label>
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={resetForm}>
+                <IconPlus className="mr-2 h-4 w-4" />
+                Add Skill
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add New Skill</DialogTitle>
+                <DialogDescription>
+                  Create a new skill with custom styling and optional icon.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Enter skill name"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="icon">Icon (Optional)</Label>
+                  <div className="flex items-center gap-2">
                     <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="Enter skill name"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="icon">Icon (Optional)</Label>
-                    <div className="flex items-center gap-2">
-                      <Input
                         ref={fileInputRef}
                         id="icon"
                         type="file"
@@ -372,13 +422,54 @@ export function SkillsDataTable({ data: initialData }: SkillsDataTableProps) {
               </DialogContent>
             </Dialog>
           </div>
-        </div>
+      </div>
       
-        {data.length === 0 ? (
+      {/* Search and Sort Controls */}
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-6">
+        <div className="relative flex-1">
+          <IconSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            placeholder="Cari skill..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="min-w-[200px] justify-between">
+              {getSortLabel(sortBy)}
+              <IconChevronDown className="ml-2 h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-[200px]">
+            <DropdownMenuItem onClick={() => setSortBy("updated-desc")}>
+              Tanggal Diperbarui (Baru)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("updated-asc")}>
+              Tanggal Diperbarui (Lama)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("created-desc")}>
+              Tanggal Dibuat (Baru)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("created-asc")}>
+              Tanggal Dibuat (Lama)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("name-asc")}>
+              Nama (A-Z)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("name-desc")}>
+              Nama (Z-A)
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      
+      {sortedSkills.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-muted-foreground">No skills found.</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Create your first skill to get started.
+          <p className="text-muted-foreground">
+            {searchQuery ? "Tidak ada skill yang sesuai dengan pencarian." : "Belum ada skill. Tambahkan skill pertama Anda."}
           </p>
         </div>
       ) : (
@@ -393,7 +484,7 @@ export function SkillsDataTable({ data: initialData }: SkillsDataTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((skill) => (
+            {sortedSkills.map((skill) => (
               <TableRow key={skill.id}>
                 <TableCell className="font-medium">{skill.name}</TableCell>
                 <TableCell>

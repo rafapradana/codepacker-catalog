@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -32,10 +32,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
-import { IconPlus, IconEdit, IconTrash } from "@tabler/icons-react"
+import { IconPlus, IconEdit, IconTrash, IconSearch, IconChevronDown } from "@tabler/icons-react"
 import { Category } from "@/lib/categories"
+
+type SortOption = "updated-desc" | "updated-asc" | "created-desc" | "created-asc" | "name-asc" | "name-desc"
 
 interface CategoriesDataTableProps {
   data: Category[]
@@ -47,6 +55,11 @@ export function CategoriesDataTable({ data }: CategoriesDataTableProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  
+  // Search and sort state
+  const [searchQuery, setSearchQuery] = useState("")
+  const [sortBy, setSortBy] = useState<SortOption>("updated-desc")
+  
   const [formData, setFormData] = useState({
     name: "",
     bgHex: "#ffffff",
@@ -61,6 +74,45 @@ export function CategoriesDataTable({ data }: CategoriesDataTableProps) {
       borderHex: "#000000",
       textHex: "#000000"
     })
+  }
+
+  // Filter and sort categories
+  const filteredCategories = categories.filter(category => {
+    if (!searchQuery) return true
+    
+    const query = searchQuery.toLowerCase()
+    return category.name.toLowerCase().includes(query)
+  })
+
+  const sortedCategories = React.useMemo(() => {
+    return [...filteredCategories].sort((a, b) => {
+      switch (sortBy) {
+        case "name-asc":
+          return a.name.localeCompare(b.name)
+        case "name-desc":
+          return b.name.localeCompare(a.name)
+        case "created-asc":
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        case "created-desc":
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        case "updated-asc":
+          return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+        case "updated-desc":
+        default:
+          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      }
+    })
+  }, [filteredCategories, sortBy])
+
+  const getSortLabel = (option: SortOption) => {
+    switch (option) {
+      case "name-asc": return "Nama (A-Z)"
+      case "name-desc": return "Nama (Z-A)"
+      case "created-asc": return "Tanggal Dibuat (Lama)"
+      case "created-desc": return "Tanggal Dibuat (Baru)"
+      case "updated-asc": return "Tanggal Diperbarui (Lama)"
+      case "updated-desc": return "Tanggal Diperbarui (Baru)"
+    }
   }
 
   const handleCreate = async () => {
@@ -288,6 +340,47 @@ export function CategoriesDataTable({ data }: CategoriesDataTableProps) {
         </Dialog>
       </div>
 
+      {/* Search and Sort Controls */}
+      <div className="flex gap-4 items-center">
+        <div className="relative flex-1">
+          <IconSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            placeholder="Cari kategori..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="min-w-[200px] justify-between">
+              {getSortLabel(sortBy)}
+              <IconChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-[200px]">
+            <DropdownMenuItem onClick={() => setSortBy("updated-desc")}>
+              Tanggal Diperbarui (Baru)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("updated-asc")}>
+              Tanggal Diperbarui (Lama)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("created-desc")}>
+              Tanggal Dibuat (Baru)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("created-asc")}>
+              Tanggal Dibuat (Lama)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("name-asc")}>
+              Nama (A-Z)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("name-desc")}>
+              Nama (Z-A)
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -302,14 +395,14 @@ export function CategoriesDataTable({ data }: CategoriesDataTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {categories.length === 0 ? (
+            {sortedCategories.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                  Belum ada kategori. Tambahkan kategori pertama Anda.
+                  {searchQuery ? "Tidak ada kategori yang sesuai dengan pencarian." : "Belum ada kategori. Tambahkan kategori pertama Anda."}
                 </TableCell>
               </TableRow>
             ) : (
-              categories.map((category) => (
+              sortedCategories.map((category) => (
                 <TableRow key={category.id}>
                   <TableCell className="font-medium">{category.name}</TableCell>
                   <TableCell>

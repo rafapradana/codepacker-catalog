@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { IconPlus, IconEdit, IconTrash, IconUpload, IconX, IconExternalLink, IconBrandGithub, IconEye, IconCalendar } from "@tabler/icons-react"
+import { IconPlus, IconEdit, IconTrash, IconUpload, IconX, IconExternalLink, IconBrandGithub, IconEye, IconCalendar, IconChevronDown, IconSearch, IconCode } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -33,6 +33,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { toast } from "sonner"
@@ -72,6 +78,8 @@ interface ProjectTechstack {
   } | null
 }
 
+type SortOption = "updated-desc" | "updated-asc" | "created-desc" | "created-asc" | "name-asc" | "name-desc"
+
 export function ProjectsDataTable() {
   const [projects, setProjects] = React.useState<ProjectWithDetails[]>([])
   const [students, setStudents] = React.useState<Student[]>([])
@@ -83,6 +91,10 @@ export function ProjectsDataTable() {
   const [editingProject, setEditingProject] = React.useState<ProjectWithDetails | null>(null)
   const [viewingProject, setViewingProject] = React.useState<ProjectWithDetails | null>(null)
   const [isLoading, setIsLoading] = React.useState(false)
+  
+  // Search and sort state
+  const [searchQuery, setSearchQuery] = React.useState("")
+  const [sortBy, setSortBy] = React.useState<SortOption>("updated-desc")
   
   // Form state
   const [formData, setFormData] = React.useState<ProjectFormData>({
@@ -148,6 +160,51 @@ export function ProjectsDataTable() {
 
     fetchData()
   }, [])
+
+  // Filter and sort projects
+  const filteredProjects = projects.filter(project => {
+    if (!searchQuery) return true
+    
+    const query = searchQuery.toLowerCase()
+    return (
+      project.title.toLowerCase().includes(query) ||
+      (project.description?.toLowerCase().includes(query) || false) ||
+      (project.student?.fullName.toLowerCase().includes(query) || false) ||
+      (project.category?.name.toLowerCase().includes(query) || false)
+    )
+  })
+
+  const sortedProjects = React.useMemo(() => {
+    const sorted = [...filteredProjects]
+    
+    switch (sortBy) {
+      case "name-asc":
+        return sorted.sort((a, b) => a.title.localeCompare(b.title))
+      case "name-desc":
+        return sorted.sort((a, b) => b.title.localeCompare(a.title))
+      case "created-asc":
+        return sorted.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+      case "created-desc":
+        return sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      case "updated-asc":
+        return sorted.sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime())
+      case "updated-desc":
+      default:
+        return sorted.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+    }
+  }, [filteredProjects, sortBy])
+
+  const getSortLabel = (sortOption: SortOption): string => {
+    switch (sortOption) {
+      case "updated-desc": return "Terbaru Diperbarui"
+      case "updated-asc": return "Terlama Diperbarui"
+      case "created-desc": return "Terbaru Dibuat"
+      case "created-asc": return "Terlama Dibuat"
+      case "name-asc": return "Nama A-Z"
+      case "name-desc": return "Nama Z-A"
+      default: return "Terbaru Diperbarui"
+    }
+  }
 
   const resetForm = () => {
     setFormData({
@@ -932,10 +989,52 @@ export function ProjectsDataTable() {
           </Dialog>
         </div>
         
+        {/* Search and Sort Controls */}
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <div className="relative flex-1">
+            <IconSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Cari project, siswa, atau kategori..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="min-w-[200px] justify-between">
+                {getSortLabel(sortBy)}
+                <IconChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[200px]">
+              <DropdownMenuItem onClick={() => setSortBy("updated-desc")}>
+                Terbaru Diperbarui
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("updated-asc")}>
+                Terlama Diperbarui
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("created-desc")}>
+                Terbaru Dibuat
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("created-asc")}>
+                Terlama Dibuat
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("name-asc")}>
+                Nama A-Z
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("name-desc")}>
+                Nama Z-A
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        
         {/* Projects Grid Layout - 3 cards per row */}
-        {projects.length > 0 ? (
+        {sortedProjects.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map((project) => (
+            {sortedProjects.map((project) => (
               <ProjectCard
                 key={project.id}
                 project={project}
