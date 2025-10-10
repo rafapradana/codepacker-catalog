@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { IconPlus, IconEdit, IconTrash, IconSchool } from "@tabler/icons-react"
+import { IconPlus, IconEdit, IconTrash, IconSchool, IconSearch, IconChevronDown } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -38,6 +38,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
@@ -47,6 +53,8 @@ interface ClassesDataTableProps {
   data: Class[]
 }
 
+type SortOption = "name-asc" | "name-desc" | "created-asc" | "created-desc" | "updated-asc" | "updated-desc"
+
 export function ClassesDataTable({ data }: ClassesDataTableProps) {
   const [classes, setClasses] = React.useState<Class[]>(data)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false)
@@ -54,6 +62,8 @@ export function ClassesDataTable({ data }: ClassesDataTableProps) {
   const [editingClass, setEditingClass] = React.useState<Class | null>(null)
   const [className, setClassName] = React.useState("")
   const [isLoading, setIsLoading] = React.useState(false)
+  const [searchQuery, setSearchQuery] = React.useState("")
+  const [sortBy, setSortBy] = React.useState<SortOption>("updated-desc")
 
   const handleCreate = async () => {
     if (!className.trim()) {
@@ -160,15 +170,56 @@ export function ClassesDataTable({ data }: ClassesDataTableProps) {
     setIsEditDialogOpen(false)
   }
 
+  // Filter classes based on search query
+  const filteredClasses = classes.filter(classItem =>
+    classItem.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  // Sort classes based on selected option
+  const sortedClasses = [...filteredClasses].sort((a, b) => {
+    switch (sortBy) {
+      case "name-asc":
+        return a.name.localeCompare(b.name)
+      case "name-desc":
+        return b.name.localeCompare(a.name)
+      case "created-asc":
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      case "created-desc":
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      case "updated-asc":
+        return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+      case "updated-desc":
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      default:
+        return 0
+    }
+  })
+
+  const getSortLabel = (sortOption: SortOption) => {
+    switch (sortOption) {
+      case "name-asc":
+        return "Nama A-Z"
+      case "name-desc":
+        return "Nama Z-A"
+      case "created-asc":
+        return "Terlama Dibuat"
+      case "created-desc":
+        return "Terbaru Dibuat"
+      case "updated-asc":
+        return "Terlama Diperbarui"
+      case "updated-desc":
+        return "Terbaru Diperbarui"
+      default:
+        return "Terbaru Diperbarui"
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold tracking-tight flex items-center gap-2">
-            <IconSchool className="size-5" />
-            Daftar Kelas
-          </h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className="text-2xl font-bold tracking-tight">Daftar Kelas</h2>
+          <p className="text-muted-foreground">
             Kelola data kelas siswa
           </p>
         </div>
@@ -212,11 +263,61 @@ export function ClassesDataTable({ data }: ClassesDataTableProps) {
         </Dialog>
       </div>
       
-      {classes.length === 0 ? (
+      {/* Search Bar and Sorting */}
+      <div className="flex items-center space-x-2">
+        <div className="relative flex-1">
+          <IconSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground size-4" />
+          <Input
+            placeholder="Cari kelas..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="flex items-center space-x-2">
+              <span>{getSortLabel(sortBy)}</span>
+              <IconChevronDown className="size-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={() => setSortBy("updated-desc")}>
+              Terbaru Diperbarui
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("updated-asc")}>
+              Terlama Diperbarui
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("created-desc")}>
+              Terbaru Dibuat
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("created-asc")}>
+              Terlama Dibuat
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("name-asc")}>
+              Nama A-Z
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("name-desc")}>
+              Nama Z-A
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      
+      {sortedClasses.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground">
           <IconSchool className="size-12 mx-auto mb-4 opacity-50" />
-          <p>Belum ada data kelas</p>
-          <p className="text-sm">Klik tombol "Tambah Kelas" untuk menambahkan kelas baru</p>
+          {searchQuery ? (
+            <>
+              <p>Tidak ada kelas yang ditemukan</p>
+              <p className="text-sm">Coba ubah kata kunci pencarian Anda</p>
+            </>
+          ) : (
+            <>
+              <p>Belum ada data kelas</p>
+              <p className="text-sm">Klik tombol "Tambah Kelas" untuk menambahkan kelas baru</p>
+            </>
+          )}
         </div>
       ) : (
         <Table>
@@ -229,7 +330,7 @@ export function ClassesDataTable({ data }: ClassesDataTableProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {classes.map((classItem) => (
+              {sortedClasses.map((classItem) => (
                 <TableRow key={classItem.id}>
                   <TableCell className="font-medium">
                     {classItem.name}
