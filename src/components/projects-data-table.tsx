@@ -669,7 +669,7 @@ export function ProjectsDataTable() {
               Tambah Project
             </Button>
           </DialogTrigger>
-            <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader className="space-y-3 pb-6 border-b">
                 <DialogTitle className="text-xl font-semibold">Tambah Project Baru</DialogTitle>
                 <DialogDescription className="text-sm text-muted-foreground">
@@ -677,13 +677,13 @@ export function ProjectsDataTable() {
                 </DialogDescription>
               </DialogHeader>
               
-              <div className="space-y-8 py-6">
+              <div className="space-y-6 py-4">
                 {/* Basic Information Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium text-foreground border-b pb-2">
+                  <h3 className="text-base font-semibold text-foreground border-b pb-2">
                     Informasi Dasar
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="studentId" className="text-sm font-medium">
                         Siswa <span className="text-destructive">*</span>
@@ -753,10 +753,10 @@ export function ProjectsDataTable() {
 
                 {/* URLs Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium text-foreground border-b pb-2">
+                  <h3 className="text-base font-semibold text-foreground border-b pb-2">
                     URL & Links
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="githubUrl" className="text-sm font-medium">
                         GitHub URL <span className="text-destructive">*</span>
@@ -776,71 +776,78 @@ export function ProjectsDataTable() {
                         value={formData.liveDemoUrl}
                         onChange={(e) => setFormData({ ...formData, liveDemoUrl: e.target.value })}
                         placeholder="https://example.com"
+                        className="h-10"
                       />
                     </div>
                   </div>
                 </div>
                 
-                {/* Thumbnail Upload */}
-                <div className="space-y-2">
-                  <Label>Thumbnail Project</Label>
-                  <div className="flex items-center gap-4">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className="flex-1"
-                    />
-                    {filePreview && (
-                      <div className="relative">
-                        <img
-                          src={filePreview}
-                          alt="Preview"
-                          className="w-16 h-16 object-cover rounded"
-                        />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          className="absolute -top-2 -right-2 h-6 w-6 p-0"
-                          onClick={() => {
-                            setSelectedFile(null)
-                            setFilePreview(null)
-                          }}
-                        >
-                          <IconX className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                {/* Media Management */}
-                <div className="space-y-2">
-                  <Label>Media Project</Label>
-                  <div className="border rounded-lg p-4 space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>Pilih File Media</Label>
-                        <Input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
-                          onChange={handleMediaFileChange}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Tipe Media</Label>
-                        <Select value={newMediaType} onValueChange={(value: 'image' | 'video') => setNewMediaType(value)}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="image">Image</SelectItem>
-                            <SelectItem value="video">Video</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                {/* Media Section */}
+                <div className="space-y-4">
+                  <h3 className="text-base font-semibold text-foreground border-b pb-2">
+                    Media Project
+                  </h3>
+                  
+                  {/* Thumbnail Upload */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Thumbnail Project</Label>
+                    <div className="flex items-center gap-4">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="flex-1"
+                      />
+                      {filePreview && (
+                        <div className="relative">
+                          <img
+                            src={filePreview}
+                            alt="Preview"
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            className="absolute -top-2 -right-2 h-6 w-6 p-0"
+                            onClick={() => {
+                              setSelectedFile(null)
+                              setFilePreview(null)
+                            }}
+                          >
+                            <IconX className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      )}
                     </div>
+                  </div>
+                  
+                  {/* Media Management */}
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">Media Tambahan</Label>
+                    <div className="border rounded-lg p-4 space-y-4">
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label className="text-sm">Pilih File Media</Label>
+                          <Input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
+                            onChange={handleMediaFileChange}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-sm">Tipe Media</Label>
+                          <Select value={newMediaType} onValueChange={(value: 'image' | 'video') => setNewMediaType(value)}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="image">Image</SelectItem>
+                              <SelectItem value="video">Video</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
                     
                     {/* Media Preview */}
                     {selectedMediaFile && (
@@ -976,7 +983,9 @@ export function ProjectsDataTable() {
                     )}
                   </div>
                 </div>
+                </div>
               </div>
+              
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
                   Batal
@@ -1054,7 +1063,7 @@ export function ProjectsDataTable() {
       
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader className="pb-6 border-b">
             <DialogTitle className="text-xl font-semibold">Edit Project</DialogTitle>
             <DialogDescription className="text-muted-foreground">
@@ -1062,13 +1071,13 @@ export function ProjectsDataTable() {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="py-6 space-y-8">
+          <div className="py-4 space-y-6">
             {/* Informasi Dasar */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
+              <h3 className="text-base font-semibold text-foreground border-b pb-2">
                 Informasi Dasar
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="edit-studentId" className="text-sm font-medium">Siswa *</Label>
                   <Select
@@ -1134,10 +1143,10 @@ export function ProjectsDataTable() {
             
             {/* URL & Links */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
+              <h3 className="text-base font-semibold text-foreground border-b pb-2">
                 URL & Links
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="edit-githubUrl" className="text-sm font-medium">GitHub URL *</Label>
                   <Input
@@ -1161,12 +1170,15 @@ export function ProjectsDataTable() {
               </div>
             </div>
             
-            {/* Thumbnail Section */}
+            {/* Media Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Thumbnail Project
+              <h3 className="text-base font-semibold text-foreground border-b pb-2">
+                Media Project
               </h3>
-              <div className="space-y-3">
+              
+              {/* Thumbnail Upload */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Thumbnail Project</Label>
                 <div className="flex items-center gap-4">
                   <Input
                     type="file"
@@ -1185,7 +1197,7 @@ export function ProjectsDataTable() {
                         type="button"
                         variant="destructive"
                         size="sm"
-                        className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full"
+                        className="absolute -top-2 -right-2 h-6 w-6 p-0"
                         onClick={() => {
                           setSelectedFile(null)
                           setFilePreview(null)
@@ -1392,7 +1404,7 @@ export function ProjectsDataTable() {
 
       {/* View Detail Dialog */}
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
-        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader className="space-y-3 pb-6 border-b">
             <DialogTitle className="text-xl font-semibold">Detail Project</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">
