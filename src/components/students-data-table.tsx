@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { IconPlus, IconEdit, IconTrash, IconUser, IconUpload, IconX } from "@tabler/icons-react"
+import { IconPlus, IconEdit, IconTrash, IconUser, IconUpload, IconX, IconCheck } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -111,6 +111,7 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
   // Skills management state
   const [studentSkills, setStudentSkills] = React.useState<StudentSkill[]>([])
   const [selectedSkillId, setSelectedSkillId] = React.useState<string | undefined>(undefined)
+  const [selectedSkillIds, setSelectedSkillIds] = React.useState<string[]>([])
 
   const resetForm = () => {
     setFormData({
@@ -128,6 +129,7 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
     setFilePreview(null)
     setStudentSkills([])
     setSelectedSkillId(undefined)
+    setSelectedSkillIds([])
   }
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -191,6 +193,16 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
       console.error("Error fetching student skills:", error)
     }
   }
+
+  const handleSkillToggle = (skillId: string) => {
+    setSelectedSkillIds(prev => {
+      if (prev.includes(skillId)) {
+        return prev.filter(id => id !== skillId);
+      } else {
+        return [...prev, skillId];
+      }
+    });
+  };
 
   const handleAddSkill = async () => {
     if (!selectedSkillId) {
@@ -278,6 +290,7 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
           bio: formData.bio || null,
           githubUrl: formData.githubUrl || null,
           linkedinUrl: formData.linkedinUrl || null,
+          skillIds: selectedSkillIds,
         }),
       })
 
@@ -578,58 +591,86 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Kelola Skills</h3>
                 
-                {/* Add Skill */}
-                <div className="flex gap-2">
-                  <Select value={selectedSkillId} onValueChange={setSelectedSkillId}>
-                    <SelectTrigger className="flex-1">
-                      <SelectValue placeholder="Pilih skill untuk ditambahkan" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableSkills.map((skill) => (
-                        <SelectItem key={skill.id} value={skill.id}>
-                          {skill.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button onClick={handleAddSkill} disabled={!selectedSkillId}>
-                    <IconPlus className="h-4 w-4 mr-2" />
-                    Tambah
-                  </Button>
+                {/* Skills Selection Grid */}
+                <div className="space-y-3">
+                  <Label>Pilih Skills</Label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-60 overflow-y-auto">
+                    {skills.map((skill) => {
+                      const isSelected = selectedSkillIds.includes(skill.id);
+                      return (
+                        <div
+                          key={skill.id}
+                          onClick={() => handleSkillToggle(skill.id)}
+                          className={`
+                            relative cursor-pointer rounded-lg border-2 p-3 transition-all duration-200 hover:shadow-md
+                            ${isSelected 
+                              ? 'border-primary bg-primary/10 shadow-sm' 
+                              : 'border-border bg-card hover:border-primary/50'
+                            }
+                          `}
+                        >
+                          <div className="flex flex-col items-center gap-2 text-center">
+                            {skill.iconUrl && (
+                              <img 
+                                src={skill.iconUrl} 
+                                alt={skill.name}
+                                className="w-8 h-8 object-contain"
+                              />
+                            )}
+                            <span className="text-sm font-medium text-foreground">
+                              {skill.name}
+                            </span>
+                          </div>
+                          {isSelected && (
+                            <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                              <IconCheck className="w-4 h-4 text-primary-foreground" />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
 
-                {/* Current Skills */}
+                {/* Selected Skills Display */}
                 <div className="space-y-2">
-                  <Label>Skills Saat Ini</Label>
-                  {studentSkills.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">Belum ada skill</p>
+                  <Label>Skills Terpilih ({selectedSkillIds.length})</Label>
+                  {selectedSkillIds.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">Belum ada skill yang dipilih</p>
                   ) : (
                     <div className="flex flex-wrap gap-2">
-                      {studentSkills.map((skill) => (
-                        <Badge
-                          key={skill.id}
-                          variant="secondary"
-                          className="flex items-center gap-2"
-                          style={{
-                            backgroundColor: skill.bgHex,
-                            borderColor: skill.borderHex,
-                            color: skill.textHex,
-                          }}
-                        >
-                          {skill.iconUrl && (
-                            <img src={skill.iconUrl} alt="" className="w-4 h-4" />
-                          )}
-                          {skill.name}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-4 w-4 p-0 hover:bg-transparent"
-                            onClick={() => handleRemoveSkill(skill.id)}
+                      {selectedSkillIds.map((skillId) => {
+                        const skill = skills.find(s => s.id === skillId);
+                        if (!skill) return null;
+                        return (
+                          <Badge
+                            key={skill.id}
+                            variant="secondary"
+                            className="flex items-center gap-2"
+                            style={{
+                              backgroundColor: skill.bgHex,
+                              borderColor: skill.borderHex,
+                              color: skill.textHex,
+                            }}
                           >
-                            <IconX className="h-3 w-3" />
-                          </Button>
-                        </Badge>
-                      ))}
+                            {skill.iconUrl && (
+                              <img src={skill.iconUrl} alt="" className="w-4 h-4" />
+                            )}
+                            {skill.name}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-4 w-4 p-0 hover:bg-transparent"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSkillToggle(skill.id);
+                              }}
+                            >
+                              <IconX className="h-3 w-3" />
+                            </Button>
+                          </Badge>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

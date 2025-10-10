@@ -58,6 +58,7 @@ export interface CreateStudentWithUserData {
   githubUrl?: string;
   linkedinUrl?: string;
   classId?: string | null;
+  skillIds?: string[];
 }
 
 export interface UpdateStudentData {
@@ -225,7 +226,19 @@ export async function createStudentWithUser(data: CreateStudentWithUserData): Pr
       classId: data.classId,
     };
 
-    return await createStudent(studentData);
+    const student = await createStudent(studentData);
+    
+    // Add skills if provided
+    if (student && data.skillIds && data.skillIds.length > 0) {
+      for (const skillId of data.skillIds) {
+        await db.insert(studentSkills).values({
+          studentId: student.id,
+          skillId: skillId
+        });
+      }
+    }
+
+    return student;
   } catch (error) {
     console.error('Error creating student with user:', error);
     return null;

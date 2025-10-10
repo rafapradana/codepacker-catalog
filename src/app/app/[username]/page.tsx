@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Github, Linkedin, Calendar, MapPin } from 'lucide-react'
 import { ProjectCard } from '@/components/project-card'
+import { FollowButton } from '@/components/follow-button'
+import { FollowStats } from '@/components/follow-stats'
 import { getStudentSession } from "@/lib/session"
 
 interface Student {
@@ -174,6 +176,14 @@ export default function StudentProfilePage() {
                 {student.user.username}
               </h1>
               <div className="flex justify-center sm:justify-start gap-2">
+                {/* Follow Button - Only show if not viewing own profile */}
+                {currentStudentId && currentStudentId !== student.id && (
+                  <FollowButton 
+                    studentId={student.id} 
+                    variant="default" 
+                    size="sm"
+                  />
+                )}
                 {student.githubUrl && (
                   <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none">
                     <a href={student.githubUrl} target="_blank" rel="noopener noreferrer">
@@ -199,10 +209,8 @@ export default function StudentProfilePage() {
                 <div className="font-semibold text-lg text-foreground">{student.projects.length}</div>
                 <div className="text-sm text-muted-foreground">projects</div>
               </div>
-              <div className="text-center">
-                <div className="font-semibold text-lg text-foreground">{student.studentSkills.length}</div>
-                <div className="text-sm text-muted-foreground">skills</div>
-              </div>
+              {/* Follow Stats - Moved here to be next to project stats */}
+              <FollowStats studentId={student.id} />
             </div>
 
             {/* Full Name and Info */}

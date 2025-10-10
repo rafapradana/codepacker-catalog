@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, text, timestamp, boolean, integer } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, text, timestamp, boolean, integer, unique } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 // Users table
@@ -116,6 +116,18 @@ export const projectMedia = pgTable('project_media', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// Student Follows table - for follow system
+export const studentFollows = pgTable('student_follows', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  followerId: uuid('follower_id').references(() => students.id).notNull(), // Who is following
+  followingId: uuid('following_id').references(() => students.id).notNull(), // Who is being followed
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  // Composite unique constraint to prevent duplicate follows
+  uniqueFollow: unique().on(table.followerId, table.followingId),
+}));
+
 // Relations
 export const usersRelations = relations(users, ({ one }) => ({
   student: one(students, {
@@ -139,6 +151,9 @@ export const studentsRelations = relations(students, ({ one, many }) => ({
   }),
   projects: many(projects),
   studentSkills: many(studentSkills),
+  // Follow relations
+  followers: many(studentFollows, { relationName: 'followers' }), // Students who follow this student
+  following: many(studentFollows, { relationName: 'following' }), // Students this student follows
 }));
 
 export const adminsRelations = relations(admins, ({ one }) => ({
@@ -203,5 +218,19 @@ export const projectMediaRelations = relations(projectMedia, ({ one }) => ({
   project: one(projects, {
     fields: [projectMedia.projectId],
     references: [projects.id],
+  }),
+}));
+
+// Student Follows relations
+export const studentFollowsRelations = relations(studentFollows, ({ one }) => ({
+  follower: one(students, {
+    fields: [studentFollows.followerId],
+    references: [students.id],
+    relationName: 'followers',
+  }),
+  following: one(students, {
+    fields: [studentFollows.followingId],
+    references: [students.id],
+    relationName: 'following',
   }),
 }));

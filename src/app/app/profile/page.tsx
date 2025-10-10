@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Github, Linkedin, MapPin, Calendar } from "lucide-react"
 import { ProjectCard } from "@/components/project-card"
+import { FollowStats } from '@/components/follow-stats'
 import { getStudentSession } from "@/lib/session"
 
 interface Student {
@@ -231,10 +232,7 @@ export default function ProfilePage() {
                 <div className="font-semibold text-lg text-foreground">{student.projects?.length || 0}</div>
                 <div className="text-sm text-muted-foreground">projects</div>
               </div>
-              <div className="text-center">
-                <div className="font-semibold text-lg text-foreground">{student.studentSkills?.length || 0}</div>
-                <div className="text-sm text-muted-foreground">skills</div>
-              </div>
+              <FollowStats studentId={student.id} />
             </div>
 
             {/* Full Name and Info */}
