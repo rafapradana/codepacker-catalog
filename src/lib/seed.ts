@@ -1,5 +1,5 @@
 import { db } from './db';
-import { users, classes, students, admins, categories, skills, techstacks } from './schema';
+import { users, classes, students, admins, categories, skills, techstacks, gradingMetrics } from './schema';
 import bcrypt from 'bcryptjs';
 
 async function seed() {
@@ -168,6 +168,81 @@ async function seed() {
       }
     ]).returning();
 
+    // Create grading metrics
+    console.log('📊 Creating grading metrics...');
+    const gradingMetricsData = await db.insert(gradingMetrics).values([
+      {
+        name: 'Technical Implementation',
+        description: 'Kualitas kode (clean code, struktur, naming convention), penggunaan teknologi yang tepat, kompleksitas teknis yang diterapkan',
+        maxScore: 10,
+        weight: '1.00',
+        isActive: true
+      },
+      {
+        name: 'User Interface/User Experience',
+        description: 'Desain visual yang menarik, kemudahan penggunaan (usability), responsiveness di berbagai device',
+        maxScore: 10,
+        weight: '1.00',
+        isActive: true
+      },
+      {
+        name: 'Functionality',
+        description: 'Kelengkapan fitur sesuai requirement, fitur berjalan dengan baik tanpa bug, edge case handling',
+        maxScore: 10,
+        weight: '1.00',
+        isActive: true
+      },
+      {
+        name: 'Code Quality',
+        description: 'Struktur folder dan file yang rapi, dokumentasi kode (comments, README), best practices programming',
+        maxScore: 10,
+        weight: '1.00',
+        isActive: true
+      },
+      {
+        name: 'Innovation & Creativity',
+        description: 'Keunikan ide atau pendekatan, problem solving yang kreatif, value proposition yang jelas',
+        maxScore: 10,
+        weight: '1.00',
+        isActive: true
+      },
+      {
+        name: 'Performance',
+        description: 'Loading speed, optimasi resource, scalability consideration',
+        maxScore: 10,
+        weight: '1.00',
+        isActive: true
+      },
+      {
+        name: 'Security',
+        description: 'Input validation, authentication/authorization (jika ada), data protection',
+        maxScore: 10,
+        weight: '1.00',
+        isActive: true
+      },
+      {
+        name: 'Documentation',
+        description: 'README yang lengkap, setup instructions yang jelas, API documentation (jika ada)',
+        maxScore: 10,
+        weight: '1.00',
+        isActive: true
+      },
+      {
+        name: 'Deployment & Accessibility',
+        description: 'Project bisa diakses online, setup deployment yang proper, URL yang working',
+        maxScore: 10,
+        weight: '1.00',
+        isActive: true
+      },
+      {
+        name: 'Presentation & Communication',
+        description: 'Kemampuan explain project, demo yang smooth, storytelling yang baik',
+        maxScore: 10,
+        weight: '1.00',
+        isActive: true
+      }
+    ]).returning();
+
     // Create admin user
     console.log('👤 Creating admin user...');
     const adminPassword = await bcrypt.hash('admin123', 10);
@@ -208,6 +283,7 @@ async function seed() {
     console.log(`   - ${categoriesData.length} categories`);
     console.log(`   - ${skillsData.length} skills`);
     console.log(`   - ${techstacksData.length} tech stacks`);
+    console.log(`   - ${gradingMetricsData.length} grading metrics`);
     console.log('   - 1 admin user (admin/admin123)');
     console.log('   - 1 student user (johndoe/student123)');
 

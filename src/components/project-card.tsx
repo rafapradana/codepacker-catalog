@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { IconBrandGithub, IconExternalLink, IconCalendar, IconEdit, IconTrash, IconEye } from "@tabler/icons-react"
+import { IconBrandGithub, IconExternalLink, IconCalendar, IconEdit, IconTrash, IconEye, IconHeart, IconHeartFilled } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -20,6 +20,8 @@ import {
 import { ProjectWithDetails } from "@/lib/projects"
 import Link from "next/link"
 import Image from "next/image"
+import { getStudentSession } from "@/lib/session"
+import { toast } from "sonner"
 
 // Admin interface for dashboard
 interface AdminProjectCardProps {
@@ -88,6 +90,75 @@ function isAdminProps(props: ProjectCardProps): props is AdminProjectCardProps {
 
 export function ProjectCard(props: ProjectCardProps) {
   const { project } = props
+  
+  // Like functionality state
+  const [likeCount, setLikeCount] = React.useState(0)
+  const [isLiked, setIsLiked] = React.useState(false)
+  const [isLikeLoading, setIsLikeLoading] = React.useState(false)
+
+  // Fetch like status on component mount
+  React.useEffect(() => {
+    const fetchLikeStatus = async () => {
+      try {
+        const session = getStudentSession()
+        const studentId = session?.studentId || ''
+        
+        const response = await fetch(`/api/projects/${project.id}/like?studentId=${studentId}`)
+        if (response.ok) {
+          const data = await response.json()
+          setLikeCount(data.likeCount)
+          setIsLiked(data.isLiked)
+        }
+      } catch (error) {
+        console.error('Error fetching like status:', error)
+      }
+    }
+
+    fetchLikeStatus()
+  }, [project.id])
+
+  // Handle like/unlike
+  const handleLikeToggle = async () => {
+    const session = getStudentSession()
+    
+    if (!session?.studentId) {
+      toast.error('Silakan login untuk menyukai project')
+      return
+    }
+
+    setIsLikeLoading(true)
+    try {
+      const response = await fetch(`/api/projects/${project.id}/like`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          studentId: session.studentId
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.action === 'liked') {
+          setIsLiked(true)
+          setLikeCount(prev => prev + 1)
+          toast.success('Project berhasil disukai!')
+        } else {
+          setIsLiked(false)
+          setLikeCount(prev => prev - 1)
+          toast.success('Like berhasil dihapus')
+        }
+      } else {
+        toast.error('Gagal memproses like')
+      }
+    } catch (error) {
+      console.error('Error toggling like:', error)
+      toast.error('Terjadi kesalahan')
+    } finally {
+      setIsLikeLoading(false)
+    }
+  }
   
   // If it's admin props, render admin version
   if (isAdminProps(props)) {
@@ -413,6 +484,20 @@ export function ProjectCard(props: ProjectCardProps) {
                   Lihat Detail
                 </Button>
               </Link>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLikeToggle}
+                disabled={isLikeLoading}
+                className="h-8 px-2 text-xs hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+              >
+                {isLiked ? (
+                  <IconHeartFilled className="h-3 w-3 text-red-500" />
+                ) : (
+                  <IconHeart className="h-3 w-3" />
+                )}
+                <span className="ml-1 text-xs">{likeCount}</span>
+              </Button>
               <Link href={`/app/projects/${project.id}/edit`}>
                 <Button variant="outline" size="sm" className="h-8 px-2 text-xs">
                   <IconEdit className="h-3 w-3" />
@@ -450,12 +535,28 @@ export function ProjectCard(props: ProjectCardProps) {
               )}
             </div>
           ) : (
-            <Link href={projectDetailRoute} className="block w-full">
-              <Button variant="default" size="sm" className="w-full h-8 text-xs font-medium">
-                <IconEye className="h-3 w-3 mr-1" />
-                Lihat Detail
+            <div className="flex gap-2">
+              <Link href={projectDetailRoute} className="flex-1">
+                <Button variant="default" size="sm" className="w-full h-8 text-xs font-medium">
+                  <IconEye className="h-3 w-3 mr-1" />
+                  Lihat Detail
+                </Button>
+              </Link>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLikeToggle}
+                disabled={isLikeLoading}
+                className="h-8 px-2 text-xs hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+              >
+                {isLiked ? (
+                  <IconHeartFilled className="h-3 w-3 text-red-500" />
+                ) : (
+                  <IconHeart className="h-3 w-3" />
+                )}
+                <span className="ml-1 text-xs">{likeCount}</span>
               </Button>
-            </Link>
+            </div>
           )}
         </div>
       </CardContent>

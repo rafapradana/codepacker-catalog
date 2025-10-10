@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useTheme } from "next-themes"
 import Image from "next/image"
-import { saveStudentSession } from "@/lib/session"
+import { saveStudentSession, saveAdminSession } from '@/lib/session'
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -95,7 +95,7 @@ export function LoginForm({
       const result = await response.json()
 
       if (response.ok && (result.success || result.message)) {
-        // Save session data for students only
+        // Save session data for students
         if (userType === "student" && result.user) {
           const sessionData = {
             id: result.user.id,
@@ -107,6 +107,19 @@ export function LoginForm({
             loginTime: new Date().toISOString()
           }
           saveStudentSession(sessionData)
+        }
+        
+        // Save session data for admin
+        if (userType === "admin" && result.admin) {
+          const adminSessionData = {
+            id: result.admin.id,
+            userId: result.admin.id,
+            email: result.admin.email,
+            username: result.admin.username,
+            fullName: result.admin.fullName,
+            loginTime: new Date().toISOString()
+          }
+          saveAdminSession(adminSessionData)
         }
         
         // Redirect based on user type

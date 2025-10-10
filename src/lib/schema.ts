@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, text, timestamp, boolean, integer, unique } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, text, timestamp, boolean, integer, unique, decimal } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 // Users table
@@ -128,6 +128,70 @@ export const studentFollows = pgTable('student_follows', {
   uniqueFollow: unique().on(table.followerId, table.followingId),
 }));
 
+// Project Likes table - for project like system
+export const projectLikes = pgTable('project_likes', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  projectId: uuid('project_id').references(() => projects.id).notNull(), // Which project is liked
+  studentId: uuid('student_id').references(() => students.id).notNull(), // Who liked the project
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  // Composite unique constraint to prevent duplicate likes from same student
+  uniqueProjectLike: unique().on(table.projectId, table.studentId),
+}));
+
+// Project Like History table - for tracking like/unlike actions
+export const projectLikeHistory = pgTable('project_like_history', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  projectId: uuid('project_id').references(() => projects.id).notNull(), // Which project
+  studentId: uuid('student_id').references(() => students.id).notNull(), // Who performed the action
+  action: varchar('action', { length: 10 }).notNull(), // 'like' or 'unlike'
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Grading Metrics table - defines the metrics used for grading
+export const gradingMetrics = pgTable('grading_metrics', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 255 }).notNull(),
+  description: text('description'),
+  maxScore: integer('max_score').notNull().default(10), // Maximum score for this metric
+  weight: decimal('weight', { precision: 3, scale: 2 }).default('1.00'), // Weight multiplier for this metric
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Project Grades table - stores the overall grade for each project
+export const projectGrades = pgTable('project_grades', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  projectId: uuid('project_id').references(() => projects.id).notNull(),
+  gradedBy: uuid('graded_by').references(() => admins.id).notNull(), // Admin who graded the project
+  totalScore: decimal('total_score', { precision: 5, scale: 2 }).notNull(), // Total calculated score
+  maxPossibleScore: decimal('max_possible_score', { precision: 5, scale: 2 }).notNull(), // Maximum possible score
+  percentage: decimal('percentage', { precision: 5, scale: 2 }).notNull(), // Percentage score
+  grade: varchar('grade', { length: 2 }), // Letter grade (A, B, C, D, F)
+  feedback: text('feedback'), // Overall feedback from grader
+  gradedAt: timestamp('graded_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  // Ensure one grade per project
+  uniqueProjectGrade: unique().on(table.projectId),
+}));
+
+// Project Grade Details table - stores individual metric scores
+export const projectGradeDetails = pgTable('project_grade_details', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  projectGradeId: uuid('project_grade_id').references(() => projectGrades.id).notNull(),
+  metricId: uuid('metric_id').references(() => gradingMetrics.id).notNull(),
+  score: decimal('score', { precision: 4, scale: 2 }).notNull(), // Score for this specific metric
+  feedback: text('feedback'), // Specific feedback for this metric
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  // Ensure one score per metric per grade
+  uniqueMetricScore: unique().on(table.projectGradeId, table.metricId),
+}));
+
 // Relations
 export const usersRelations = relations(users, ({ one }) => ({
   student: one(students, {
@@ -156,11 +220,12 @@ export const studentsRelations = relations(students, ({ one, many }) => ({
   following: many(studentFollows, { relationName: 'following' }), // Students this student follows
 }));
 
-export const adminsRelations = relations(admins, ({ one }) => ({
+export const adminsRelations = relations(admins, ({ one, many }) => ({
   user: one(users, {
     fields: [admins.userId],
     references: [users.id],
   }),
+  projectGrades: many(projectGrades), // Projects graded by this admin
 }));
 
 export const classesRelations = relations(classes, ({ many }) => ({
@@ -178,6 +243,9 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   }),
   projectTechstacks: many(projectTechstacks),
   projectMedia: many(projectMedia),
+  projectGrade: one(projectGrades), // Grade for this project
+  projectLikes: many(projectLikes), // Likes for this project
+  projectLikeHistory: many(projectLikeHistory), // Like history for this project
 }));
 
 export const categoriesRelations = relations(categories, ({ many }) => ({
@@ -232,5 +300,59 @@ export const studentFollowsRelations = relations(studentFollows, ({ one }) => ({
     fields: [studentFollows.followingId],
     references: [students.id],
     relationName: 'following',
+  }),
+}));
+
+// Grading Metrics Relations
+export const gradingMetricsRelations = relations(gradingMetrics, ({ many }) => ({
+  projectGradeDetails: many(projectGradeDetails),
+}));
+
+// Project Grades Relations
+export const projectGradesRelations = relations(projectGrades, ({ one, many }) => ({
+  project: one(projects, {
+    fields: [projectGrades.projectId],
+    references: [projects.id],
+  }),
+  grader: one(admins, {
+    fields: [projectGrades.gradedBy],
+    references: [admins.id],
+  }),
+  gradeDetails: many(projectGradeDetails),
+}));
+
+// Project Grade Details Relations
+export const projectGradeDetailsRelations = relations(projectGradeDetails, ({ one }) => ({
+  projectGrade: one(projectGrades, {
+    fields: [projectGradeDetails.projectGradeId],
+    references: [projectGrades.id],
+  }),
+  metric: one(gradingMetrics, {
+    fields: [projectGradeDetails.metricId],
+    references: [gradingMetrics.id],
+  }),
+}));
+
+// Project Likes Relations
+export const projectLikesRelations = relations(projectLikes, ({ one }) => ({
+  project: one(projects, {
+    fields: [projectLikes.projectId],
+    references: [projects.id],
+  }),
+  student: one(students, {
+    fields: [projectLikes.studentId],
+    references: [students.id],
+  }),
+}));
+
+// Project Like History Relations
+export const projectLikeHistoryRelations = relations(projectLikeHistory, ({ one }) => ({
+  project: one(projects, {
+    fields: [projectLikeHistory.projectId],
+    references: [projects.id],
+  }),
+  student: one(students, {
+    fields: [projectLikeHistory.studentId],
+    references: [students.id],
   }),
 }));
