@@ -205,6 +205,8 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
       if (response.ok) {
         const skills = await response.json()
         setStudentSkills(skills)
+        // Initialize selectedSkillIds with current student skills for edit modal
+        setSelectedSkillIds(skills.map((skill: StudentSkill) => skill.id))
       }
     } catch (error) {
       console.error("Error fetching student skills:", error)
@@ -386,7 +388,10 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(updateData),
+        body: JSON.stringify({
+          ...updateData,
+          skillIds: selectedSkillIds,
+        }),
       })
 
       if (response.ok) {
@@ -947,7 +952,7 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Siswa</DialogTitle>
             <DialogDescription>
@@ -1095,61 +1100,89 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Kelola Skills</h3>
               
-              {/* Add Skill */}
-              <div className="flex gap-2">
-                <Select value={selectedSkillIdForAdd} onValueChange={setSelectedSkillIdForAdd}>
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="Pilih skill untuk ditambahkan" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableSkills.map((skill) => (
-                      <SelectItem key={skill.id} value={skill.id}>
-                        {skill.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Button onClick={handleAddSkill} disabled={!selectedSkillIdForAdd}>
-                  <IconPlus className="h-4 w-4 mr-2" />
-                  Tambah
-                </Button>
+              {/* Skills Selection Grid */}
+              <div className="space-y-3">
+                <Label>Pilih Skills</Label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-60 overflow-y-auto">
+                    {skills.map((skill) => {
+                      const isSelected = selectedSkillIds.includes(skill.id);
+                      return (
+                        <div
+                          key={skill.id}
+                          onClick={() => handleSkillToggle(skill.id)}
+                          className={`
+                            relative cursor-pointer rounded-lg border-2 p-3 transition-all duration-200 hover:shadow-md
+                            ${isSelected 
+                              ? 'border-primary bg-primary/10 shadow-sm' 
+                              : 'border-border bg-card hover:border-primary/50'
+                            }
+                          `}
+                        >
+                          <div className="flex flex-col items-center gap-2 text-center">
+                            {skill.iconUrl && (
+                              <img 
+                                src={skill.iconUrl} 
+                                alt={skill.name}
+                                className="w-8 h-8 object-contain"
+                              />
+                            )}
+                            <span className="text-sm font-medium text-foreground">
+                              {skill.name}
+                            </span>
+                          </div>
+                          {isSelected && (
+                            <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                              <IconCheck className="w-4 h-4 text-primary-foreground" />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
               </div>
 
-              {/* Current Skills */}
+              {/* Selected Skills Display */}
               <div className="space-y-2">
-                <Label>Skills Saat Ini</Label>
-                {studentSkills.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">Belum ada skill</p>
-                ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {studentSkills.map((skill) => (
-                      <Badge
-                        key={skill.id}
-                        variant="secondary"
-                        className="flex items-center gap-2"
-                        style={{
-                          backgroundColor: skill.bgHex,
-                          borderColor: skill.borderHex,
-                          color: skill.textHex,
-                        }}
-                      >
-                        {skill.iconUrl && (
-                          <img src={skill.iconUrl} alt="" className="w-4 h-4" />
-                        )}
-                        {skill.name}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-4 w-4 p-0 hover:bg-transparent"
-                          onClick={() => handleRemoveSkill(skill.id)}
-                        >
-                          <IconX className="h-3 w-3" />
-                        </Button>
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-              </div>
+                  <Label>Skills Terpilih ({selectedSkillIds.length})</Label>
+                  {selectedSkillIds.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">Belum ada skill yang dipilih</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {selectedSkillIds.map((skillId) => {
+                        const skill = skills.find(s => s.id === skillId);
+                        if (!skill) return null;
+                        return (
+                          <Badge
+                            key={skill.id}
+                            variant="secondary"
+                            className="flex items-center gap-2"
+                            style={{
+                              backgroundColor: skill.bgHex,
+                              borderColor: skill.borderHex,
+                              color: skill.textHex,
+                            }}
+                          >
+                            {skill.iconUrl && (
+                              <img src={skill.iconUrl} alt="" className="w-4 h-4" />
+                            )}
+                            {skill.name}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-4 w-4 p-0 hover:bg-transparent"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSkillToggle(skill.id);
+                              }}
+                            >
+                              <IconX className="h-3 w-3" />
+                            </Button>
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
             </div>
           </div>
           <DialogFooter>
