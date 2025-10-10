@@ -14,11 +14,15 @@ import { eq } from 'drizzle-orm';
 
 export interface StudentWithRelations {
   id: string;
+  userId: string;
   fullName: string;
   bio: string | null;
   profilePhotoUrl: string | null;
   githubUrl: string | null;
   linkedinUrl: string | null;
+  classId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
   className: string | null;
   user: {
     id: string;
@@ -60,14 +64,18 @@ export async function getStudentsWithRelations(): Promise<StudentWithRelations[]
     const studentsData = await db
       .select({
         id: students.id,
+        userId: students.userId,
         fullName: students.fullName,
         bio: students.bio,
         profilePhotoUrl: students.profilePhotoUrl,
         githubUrl: students.githubUrl,
         linkedinUrl: students.linkedinUrl,
+        classId: students.classId,
+        createdAt: students.createdAt,
+        updatedAt: students.updatedAt,
         className: classes.name,
-        classId: classes.id,
-        userId: users.id,
+        classIdFromClass: classes.id,
+        userIdFromUser: users.id,
         username: users.username,
         email: users.email,
         role: users.role,
@@ -93,15 +101,25 @@ export async function getStudentsWithRelations(): Promise<StudentWithRelations[]
           .where(eq(studentSkills.studentId, student.id));
 
         return {
-          ...student,
-          user: student.userId ? {
-            id: student.userId,
+          id: student.id,
+          userId: student.userId,
+          fullName: student.fullName,
+          bio: student.bio,
+          profilePhotoUrl: student.profilePhotoUrl,
+          githubUrl: student.githubUrl,
+          linkedinUrl: student.linkedinUrl,
+          classId: student.classId,
+          createdAt: student.createdAt,
+          updatedAt: student.updatedAt,
+          className: student.className,
+          user: student.userIdFromUser ? {
+            id: student.userIdFromUser,
             username: student.username,
             email: student.email,
             role: student.role,
           } : null,
-          class: student.classId ? {
-            id: student.classId,
+          class: student.classIdFromClass ? {
+            id: student.classIdFromClass,
             name: student.className,
           } : null,
           skills: studentSkillsData,
@@ -166,14 +184,18 @@ export async function getStudentWithRelationsById(studentId: string): Promise<St
     const studentData = await db
       .select({
         id: students.id,
+        userId: students.userId,
         fullName: students.fullName,
         bio: students.bio,
         profilePhotoUrl: students.profilePhotoUrl,
         githubUrl: students.githubUrl,
         linkedinUrl: students.linkedinUrl,
+        classId: students.classId,
+        createdAt: students.createdAt,
+        updatedAt: students.updatedAt,
         className: classes.name,
-        classId: classes.id,
-        userId: users.id,
+        classIdFromClass: classes.id,
+        userIdFromUser: users.id,
         username: users.username,
         email: users.email,
         role: users.role,
@@ -239,15 +261,25 @@ export async function getStudentWithRelationsById(studentId: string): Promise<St
     );
 
     return {
-      ...student,
-      user: student.userId ? {
-        id: student.userId,
+      id: student.id,
+      userId: student.userId,
+      fullName: student.fullName,
+      bio: student.bio,
+      profilePhotoUrl: student.profilePhotoUrl,
+      githubUrl: student.githubUrl,
+      linkedinUrl: student.linkedinUrl,
+      classId: student.classId,
+      createdAt: student.createdAt,
+      updatedAt: student.updatedAt,
+      className: student.className,
+      user: student.userIdFromUser ? {
+        id: student.userIdFromUser,
         username: student.username,
         email: student.email,
         role: student.role,
       } : null,
-      class: student.classId ? {
-        id: student.classId,
+      class: student.classIdFromClass ? {
+        id: student.classIdFromClass,
         name: student.className,
       } : null,
       skills: studentSkillsData,

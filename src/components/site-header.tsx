@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { ModeToggle } from "@/components/mode-toggle"
 import { ChevronRight } from "lucide-react"
 import { usePathname } from "next/navigation"
 
@@ -44,6 +45,7 @@ export function SiteHeader({ title }: SiteHeaderProps) {
         </div>
         
         <div className="ml-auto flex items-center gap-3">
+          <ModeToggle />
           <Button variant="ghost" asChild size="sm" className="h-8 px-3 text-sm font-medium">
             <a
               href="/admin/loginadmin"

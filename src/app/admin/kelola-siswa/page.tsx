@@ -5,13 +5,13 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar"
 import { StudentsDataTable } from "@/components/students-data-table"
-import { getStudents } from "@/lib/students"
+import { getStudentsWithRelations } from "@/lib/students-with-relations"
 import { getSkills } from "@/lib/skills"
 import { getClasses } from "@/lib/classes"
 
 export default async function StudentManagementPage() {
   const [students, skills, classes] = await Promise.all([
-    getStudents(),
+    getStudentsWithRelations(),
     getSkills(),
     getClasses(),
   ])

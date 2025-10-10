@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { IconPlus, IconEdit, IconTrash, IconUser, IconUpload, IconX, IconCheck } from "@tabler/icons-react"
+import { IconPlus, IconEdit, IconTrash, IconUser, IconUpload, IconX, IconCheck, IconSearch, IconChevronDown } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -48,15 +48,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import { Student } from "@/lib/students"
+import { StudentWithRelations } from "@/lib/students-with-relations"
 import { Class } from "@/lib/classes"
 import { Skill } from "@/lib/skills"
 
 interface StudentsDataTableProps {
-  data: Student[]
+  data: StudentWithRelations[]
   classes: Class[]
   skills: Skill[]
 }
@@ -84,12 +91,22 @@ interface StudentSkill {
   textHex: string
 }
 
+type SortOption = "name-asc" | "name-desc" | "created-asc" | "created-desc" | "updated-asc" | "updated-desc"
+
 export function StudentsDataTable({ data, classes, skills }: StudentsDataTableProps) {
-  const [students, setStudents] = React.useState<Student[]>(data)
+  const [students, setStudents] = React.useState<StudentWithRelations[]>(data)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
-  const [editingStudent, setEditingStudent] = React.useState<Student | null>(null)
+  const [editingStudent, setEditingStudent] = React.useState<StudentWithRelations | null>(null)
   const [isLoading, setIsLoading] = React.useState(false)
+  
+  // Search and sorting state
+  const [searchQuery, setSearchQuery] = React.useState("")
+  const [sortBy, setSortBy] = React.useState<SortOption>("updated-desc")
+  
+  // Filter state
+  const [selectedClassId, setSelectedClassId] = React.useState<string | null>(null)
+  const [selectedSkillId, setSelectedSkillId] = React.useState<string | null>(null)
   
   // Form state
   const [formData, setFormData] = React.useState<StudentFormData>({
@@ -110,7 +127,7 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
   
   // Skills management state
   const [studentSkills, setStudentSkills] = React.useState<StudentSkill[]>([])
-  const [selectedSkillId, setSelectedSkillId] = React.useState<string | undefined>(undefined)
+  const [selectedSkillIdForAdd, setSelectedSkillIdForAdd] = React.useState<string | undefined>(undefined)
   const [selectedSkillIds, setSelectedSkillIds] = React.useState<string[]>([])
 
   const resetForm = () => {
@@ -128,7 +145,7 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
     setSelectedFile(null)
     setFilePreview(null)
     setStudentSkills([])
-    setSelectedSkillId(undefined)
+    setSelectedSkillIdForAdd(undefined)
     setSelectedSkillIds([])
   }
 
@@ -205,7 +222,7 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
   };
 
   const handleAddSkill = async () => {
-    if (!selectedSkillId) {
+    if (!selectedSkillIdForAdd) {
       toast.error("Pilih skill terlebih dahulu")
       return
     }
@@ -219,12 +236,12 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ skillId: selectedSkillId }),
+        body: JSON.stringify({ skillId: selectedSkillIdForAdd }),
       })
 
       if (response.ok) {
         await fetchStudentSkills(studentId)
-        setSelectedSkillId(undefined)
+        setSelectedSkillIdForAdd(undefined)
         toast.success("Skill berhasil ditambahkan")
       } else {
         const error = await response.json()
@@ -311,7 +328,7 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
     }
   }
 
-  const handleEdit = (student: Student) => {
+  const handleEdit = (student: StudentWithRelations) => {
     setEditingStudent(student)
     setFormData({
       username: student.user?.username || "",
@@ -390,7 +407,7 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
     }
   }
 
-  const handleDelete = async (student: Student) => {
+  const handleDelete = async (student: StudentWithRelations) => {
     setIsLoading(true)
     try {
       const response = await fetch(`/api/students/${student.id}`, {
@@ -431,6 +448,64 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
   const availableSkills = skills.filter(skill => 
     !studentSkills.some(studentSkill => studentSkill.id === skill.id)
   )
+
+  // Filter and sort students
+  const filteredStudents = students.filter(student => {
+    // Search filter
+    const matchesSearch = student.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (student.user?.username || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (student.user?.email || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (student.class?.name || "").toLowerCase().includes(searchQuery.toLowerCase())
+    
+    // Class filter
+    const matchesClass = selectedClassId === null || student.classId === selectedClassId
+    
+    // Skill filter - check if student has the selected skill
+    console.log('Student:', student.fullName, 'Skills:', student.skills, 'Selected Skill ID:', selectedSkillId)
+    const matchesSkill = selectedSkillId === null || 
+      student.skills?.some(skill => skill.id === selectedSkillId)
+    console.log('Matches skill:', matchesSkill)
+    
+    return matchesSearch && matchesClass && matchesSkill
+  })
+
+  const sortedStudents = [...filteredStudents].sort((a, b) => {
+    switch (sortBy) {
+      case "name-asc":
+        return a.fullName.localeCompare(b.fullName)
+      case "name-desc":
+        return b.fullName.localeCompare(a.fullName)
+      case "created-asc":
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      case "created-desc":
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      case "updated-asc":
+        return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+      case "updated-desc":
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      default:
+        return 0
+    }
+  })
+
+  const getSortLabel = (sortOption: SortOption): string => {
+    switch (sortOption) {
+      case "updated-desc":
+        return "Terbaru Diperbarui"
+      case "updated-asc":
+        return "Terlama Diperbarui"
+      case "created-desc":
+        return "Terbaru Dibuat"
+      case "created-asc":
+        return "Terlama Dibuat"
+      case "name-asc":
+        return "Nama A-Z"
+      case "name-desc":
+        return "Nama Z-A"
+      default:
+        return "Terbaru Diperbarui"
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -695,10 +770,96 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
         </div>
       </div>
       
+      {/* Search and Sort Controls */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="relative flex-1">
+          <IconSearch className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Cari siswa..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-8"
+          />
+        </div>
+        
+        {/* Filter by Class */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="min-w-[150px] justify-between">
+              {selectedClassId ? classes.find(c => c.id === selectedClassId)?.name || "Pilih Kelas" : "Semua Kelas"}
+              <IconChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setSelectedClassId(null)}>
+              Semua Kelas
+            </DropdownMenuItem>
+            {classes.map((classItem) => (
+              <DropdownMenuItem key={classItem.id} onClick={() => setSelectedClassId(classItem.id)}>
+                {classItem.name}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        
+        {/* Filter by Skill */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="min-w-[150px] justify-between">
+              {selectedSkillId ? skills.find(s => s.id === selectedSkillId)?.name || "Pilih Skill" : "Semua Skill"}
+              <IconChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setSelectedSkillId(null)}>
+              Semua Skill
+            </DropdownMenuItem>
+            {skills.map((skill) => (
+              <DropdownMenuItem key={skill.id} onClick={() => setSelectedSkillId(skill.id)}>
+                {skill.name}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        
+        {/* Sort Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="min-w-[180px] justify-between">
+              {getSortLabel(sortBy)}
+              <IconChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setSortBy("updated-desc")}>
+              Terbaru Diperbarui
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("updated-asc")}>
+              Terlama Diperbarui
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("created-desc")}>
+              Terbaru Dibuat
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("created-asc")}>
+              Terlama Dibuat
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("name-asc")}>
+              Nama A-Z
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortBy("name-desc")}>
+              Nama Z-A
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      
       <div>
-        {students.length === 0 ? (
+        {sortedStudents.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            Belum ada data siswa. Klik "Tambah Siswa" untuk menambahkan siswa baru.
+            {searchQuery || selectedClassId || selectedSkillId ? 
+              "Tidak ada siswa yang cocok dengan filter yang dipilih." : 
+              "Belum ada data siswa. Klik \"Tambah Siswa\" untuk menambahkan siswa baru."
+            }
           </div>
         ) : (
           <Table>
@@ -712,7 +873,7 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
               </TableRow>
             </TableHeader>
             <TableBody>
-              {students.map((student) => (
+              {sortedStudents.map((student) => (
                 <TableRow key={student.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
@@ -831,6 +992,7 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
                       type="password"
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      className="col-span-3"
                       placeholder="Kosongkan jika tidak ingin mengubah password"
                     />
                     <p className="text-xs text-muted-foreground">
@@ -935,7 +1097,7 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
               
               {/* Add Skill */}
               <div className="flex gap-2">
-                <Select value={selectedSkillId} onValueChange={setSelectedSkillId}>
+                <Select value={selectedSkillIdForAdd} onValueChange={setSelectedSkillIdForAdd}>
                   <SelectTrigger className="flex-1">
                     <SelectValue placeholder="Pilih skill untuk ditambahkan" />
                   </SelectTrigger>
@@ -947,7 +1109,7 @@ export function StudentsDataTable({ data, classes, skills }: StudentsDataTablePr
                     ))}
                   </SelectContent>
                 </Select>
-                <Button onClick={handleAddSkill} disabled={!selectedSkillId}>
+                <Button onClick={handleAddSkill} disabled={!selectedSkillIdForAdd}>
                   <IconPlus className="h-4 w-4 mr-2" />
                   Tambah
                 </Button>
