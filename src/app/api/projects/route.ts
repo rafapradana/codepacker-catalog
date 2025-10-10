@@ -3,10 +3,10 @@ import { z } from 'zod';
 import { db } from '@/lib/db';
 import { projects, students, categories, projectTechstacks, projectMedia, techstacks, classes } from '@/lib/schema';
 import { eq, desc, like, and, inArray } from 'drizzle-orm';
+import { withStudentAuth } from '@/lib/middleware';
 
 // Zod schema for creating a project
 const createProjectSchema = z.object({
-  studentId: z.string(),
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   thumbnailUrl: z.string().nullable().optional().transform(val => val === null || val === "" ? undefined : val),
@@ -167,18 +167,18 @@ export async function GET(request: NextRequest) {
 
 // POST /api/projects - Create a new project
 export async function POST(request: NextRequest) {
-  try {
+  return withStudentAuth(request, async (request, { user }) => {
     const body = await request.json();
     console.log('Request body:', JSON.stringify(body, null, 2));
     
     // Validate request body
     const validatedData = createProjectSchema.parse(body);
 
-    // Verify student exists
+    // Verify student exists (using authenticated user ID)
     const student = await db
       .select({ id: students.id })
       .from(students)
-      .where(eq(students.id, validatedData.studentId))
+      .where(eq(students.id, user.id))
       .limit(1);
 
     if (student.length === 0) {
@@ -209,25 +209,12 @@ export async function POST(request: NextRequest) {
       .insert(projects)
       .values({
         ...validatedData,
+        studentId: user.id, // Use authenticated user ID
         createdAt: new Date(),
         updatedAt: new Date(),
       })
       .returning();
 
     return NextResponse.json(newProject, { status: 201 });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      console.log('Validation error:', JSON.stringify(error.issues, null, 2));
-      return NextResponse.json(
-        { error: 'Validation failed', details: error.issues },
-        { status: 400 }
-      );
-    }
-
-    console.error('Error creating project:', error);
-    return NextResponse.json(
-      { error: 'Failed to create project' },
-      { status: 500 }
-    );
-  }
+  });
 }

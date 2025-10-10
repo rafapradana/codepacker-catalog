@@ -101,8 +101,8 @@ export async function GET(
 
     const result = {
       ...project,
-      projectTechstacks: projectTechstacksList, // Use projectTechstacks instead of techstacks
-      projectMedia: projectMediaList, // Use projectMedia instead of media
+      techstacks: projectTechstacksList, // Frontend expects 'techstacks'
+      media: projectMediaList, // Frontend expects 'media'
     };
 
     return NextResponse.json(result);
