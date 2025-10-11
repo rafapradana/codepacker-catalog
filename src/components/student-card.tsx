@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { IconBrandGithub, IconBrandLinkedin, IconUser } from "@tabler/icons-react"
+import { ProfileWithOnlineStatus } from "@/components/ui/online-status-dot"
 import Link from "next/link"
 
 interface StudentCardProps {
@@ -48,13 +49,19 @@ export function StudentCard({ student, isStudentApp = false }: StudentCardProps)
       {/* Header - Centered Profile Photo */}
       <CardHeader className="pb-3 text-center">
         <div className="flex flex-col items-center space-y-2">
-          {/* Profile Photo - Center */}
-          <Avatar className="h-16 w-16 ring-2 ring-border">
-            <AvatarImage src={student.profilePhotoUrl || ""} />
-            <AvatarFallback className="bg-muted text-muted-foreground font-semibold text-lg">
-              {student.fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          {/* Profile Photo with Online Status - Center */}
+          <ProfileWithOnlineStatus 
+            userId={student.user?.id || student.id}
+            dotSize="sm"
+            dotPosition="bottom-right"
+          >
+            <Avatar className="h-16 w-16 ring-2 ring-border">
+              <AvatarImage src={student.profilePhotoUrl || ""} />
+              <AvatarFallback className="bg-muted text-muted-foreground font-semibold text-lg">
+                {student.fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          </ProfileWithOnlineStatus>
           
           {/* Full Name - Center */}
           <h3 className="font-semibold text-base leading-tight text-card-foreground">

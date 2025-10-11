@@ -6,11 +6,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { Github, Linkedin, Calendar, MapPin } from 'lucide-react'
+import { Github, Linkedin, Calendar, MapPin, Edit } from 'lucide-react'
 import { ProjectCard } from '@/components/project-card'
 import { FollowButton } from '@/components/follow-button'
 import { FollowStats } from '@/components/follow-stats'
 import { getStudentSession } from "@/lib/session"
+import { ProfileWithOnlineStatus } from '@/components/ui/online-status-dot'
+import Link from 'next/link'
 
 interface Student {
   id: string
@@ -154,18 +156,24 @@ export default function StudentProfilePage() {
   }
 
   return (
-    <main className="container mx-auto px-4 lg:px-16 xl:px-24 py-8 bg-background min-h-screen">
+    <main className="container mx-auto px-4 lg:px-16 xl:px-24 py-8">
       {/* Profile Header - Instagram Style */}
       <div className="max-w-4xl mx-auto">
         <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 mb-8">
           {/* Profile Picture */}
           <div className="flex justify-center sm:justify-start flex-shrink-0">
-            <Avatar className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 ring-2 ring-border">
-              <AvatarImage src={student.profilePhotoUrl || ''} alt={student.fullName} />
-              <AvatarFallback className="text-2xl font-semibold bg-gradient-to-br from-primary to-secondary text-primary-foreground">
-                {student.fullName.split(' ').map(n => n[0]).join('')}
-              </AvatarFallback>
-            </Avatar>
+            <ProfileWithOnlineStatus 
+              userId={student.id}
+              dotSize="lg"
+              dotPosition="bottom-right"
+            >
+              <Avatar className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 ring-2 ring-border">
+                <AvatarImage src={student.profilePhotoUrl || ''} alt={student.fullName} />
+                <AvatarFallback className="text-2xl font-semibold bg-gradient-to-br from-primary to-secondary text-primary-foreground">
+                  {student.fullName.split(' ').map(n => n[0]).join('')}
+                </AvatarFallback>
+              </Avatar>
+            </ProfileWithOnlineStatus>
           </div>
 
           {/* Profile Info */}
@@ -176,6 +184,15 @@ export default function StudentProfilePage() {
                 {student.user.username}
               </h1>
               <div className="flex justify-center sm:justify-start gap-2">
+                {/* Edit Profile Button - Only show if viewing own profile */}
+                {currentStudentId && currentStudentId === student.id && (
+                  <Button variant="default" size="sm" asChild className="flex-1 sm:flex-none">
+                    <Link href="/app/profile/edit">
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit Profil
+                    </Link>
+                  </Button>
+                )}
                 {/* Follow Button - Only show if not viewing own profile */}
                 {currentStudentId && currentStudentId !== student.id && (
                   <FollowButton 

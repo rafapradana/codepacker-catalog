@@ -36,6 +36,13 @@
       "when": 1760167130980,
       "tag": "0004_regular_leopardon",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1760174004449,
+      "tag": "0005_purple_daimon_hellstrom",
+      "breakpoints": true
     }
   ]
 }

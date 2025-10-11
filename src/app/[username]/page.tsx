@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator'
 import { Github, Linkedin, Calendar,MapPin } from 'lucide-react'
 import { ProjectCard } from '@/components/project-card'
 import { GuestNavbar } from '@/components/guest-navbar'
+import { ProfileWithOnlineStatus } from '@/components/ui/online-status-dot'
 
 interface Student {
   id: string
@@ -127,12 +128,18 @@ export default function StudentProfilePage() {
           <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 mb-8">
             {/* Profile Picture */}
             <div className="flex justify-center sm:justify-start flex-shrink-0">
-              <Avatar className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 ring-2 ring-border">
-                <AvatarImage src={student.profilePhotoUrl || ''} alt={student.fullName} />
-                <AvatarFallback className="text-2xl font-semibold bg-gradient-to-br from-primary to-secondary text-primary-foreground">
-                  {student.fullName.split(' ').map(n => n[0]).join('')}
-                </AvatarFallback>
-              </Avatar>
+              <ProfileWithOnlineStatus 
+                userId={student.id}
+                dotSize="lg"
+                dotPosition="bottom-right"
+              >
+                <Avatar className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 ring-2 ring-border">
+                  <AvatarImage src={student.profilePhotoUrl || ''} alt={student.fullName} />
+                  <AvatarFallback className="text-2xl font-semibold bg-gradient-to-br from-primary to-secondary text-primary-foreground">
+                    {student.fullName.split(' ').map(n => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+              </ProfileWithOnlineStatus>
             </div>
 
             {/* Profile Info */}

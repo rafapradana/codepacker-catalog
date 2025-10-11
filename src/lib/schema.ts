@@ -8,6 +8,8 @@ export const users = pgTable('users', {
   passwordHash: varchar('password_hash', { length: 255 }).notNull(),
   email: varchar('email', { length: 255 }).unique().notNull(),
   role: varchar('role', { length: 50 }).notNull(), // 'student' or 'admin'
+  isOnline: boolean('is_online').default(false).notNull(),
+  lastSeen: timestamp('last_seen').defaultNow().notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
   lastLogin: timestamp('last_login'),

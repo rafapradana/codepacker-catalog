@@ -115,7 +115,7 @@ export default function ProjectDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       {/* Main Content */}
       <main className="pt-6">
         {/* Article-like Content */}
