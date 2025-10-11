@@ -29,6 +29,13 @@
       "when": 1760082467111,
       "tag": "0003_faithful_scalphunter",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1760167130980,
+      "tag": "0004_regular_leopardon",
+      "breakpoints": true
     }
   ]
 }

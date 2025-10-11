@@ -48,7 +48,7 @@ const mainMenuItems = [
   {
     id: "tambah-project",
     label: "Tambah Project",
-    href: "/app/create",
+    href: "/app/create/project",
     icon: Plus,
     iconFilled: Plus,
     isSpecial: true,

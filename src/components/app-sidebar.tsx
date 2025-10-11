@@ -10,7 +10,6 @@ import {
   IconBrain,
   IconUsers,
   IconFolder,
-  IconClipboardCheck,
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { useTheme } from "next-themes"
@@ -61,11 +60,6 @@ const data = {
           title: "Kelola Project",
           url: "/admin/kelola-project",
           icon: IconFolder,
-        },
-        {
-          title: "Penilaian Project",
-          url: "/admin/penilaian-project",
-          icon: IconClipboardCheck,
         },
       ],
     },
