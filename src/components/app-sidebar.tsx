@@ -10,6 +10,7 @@ import {
   IconBrain,
   IconUsers,
   IconFolder,
+  IconMessageShare,
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { useTheme } from "next-themes"
@@ -60,6 +61,11 @@ const data = {
           title: "Kelola Project",
           url: "/admin/kelola-project",
           icon: IconFolder,
+        },
+        {
+          title: "Feedback",
+          url: "/admin/feedback",
+          icon: IconMessageShare,
         },
       ],
     },

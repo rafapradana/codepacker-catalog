@@ -142,7 +142,7 @@ export const projectLikes = pgTable('project_likes', {
   uniqueProjectLike: unique().on(table.projectId, table.studentId),
 }));
 
-// Project Like History table - for tracking like/unlike actions
+// Project Like History table
 export const projectLikeHistory = pgTable('project_like_history', {
   id: uuid('id').primaryKey().defaultRandom(),
   projectId: uuid('project_id').references(() => projects.id).notNull(), // Which project
@@ -150,6 +150,17 @@ export const projectLikeHistory = pgTable('project_like_history', {
   action: varchar('action', { length: 10 }).notNull(), // 'like' or 'unlike'
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+// Feedback table
+export const feedback = pgTable('feedback', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  studentId: uuid('student_id').references(() => students.id).notNull(), // Who gave the feedback
+  feedbackText: text('feedback_text').notNull(), // The feedback content
+  status: varchar('status', { length: 50 }).default('belum ditanggapi').notNull(), // 'belum ditanggapi', 'sudah ditanggapi', 'ditolak'
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 
 
 
@@ -183,6 +194,7 @@ export const studentsRelations = relations(students, ({ one, many }) => ({
   // Follow relations
   followers: many(studentFollows, { relationName: 'followers' }), // Students who follow this student
   following: many(studentFollows, { relationName: 'following' }), // Students this student follows
+  feedback: many(feedback), // Feedback given by this student
 }));
 
 export const adminsRelations = relations(admins, ({ one }) => ({
@@ -292,6 +304,14 @@ export const projectLikeHistoryRelations = relations(projectLikeHistory, ({ one 
   }),
   student: one(students, {
     fields: [projectLikeHistory.studentId],
+    references: [students.id],
+  }),
+}));
+
+// Feedback relations
+export const feedbackRelations = relations(feedback, ({ one }) => ({
+  student: one(students, {
+    fields: [feedback.studentId],
     references: [students.id],
   }),
 }));

@@ -5,10 +5,11 @@ import { eq, and, count } from 'drizzle-orm'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const projectId = params.id
+    const { id } = await params
+    const projectId = id
 
     // Get student session from request headers or body
     const body = await request.json()
@@ -111,10 +112,11 @@ export async function POST(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const projectId = params.id
+    const { id } = await params
+    const projectId = id
     const { searchParams } = new URL(request.url)
     const studentId = searchParams.get('studentId')
 

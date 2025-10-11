@@ -10,11 +10,13 @@ import {
   Plus, 
   LayoutGrid, 
   UserRound, 
+  MessageSquare,
   Settings,
   HomeIcon,
   SearchIcon,
   LayoutGridIcon,
   UserRoundIcon,
+  MessageSquareIcon,
   SettingsIcon
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -24,6 +26,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { FeedbackModal } from "@/components/feedback-modal"
 
 interface StudentSidebarProps {
   currentPage: string
@@ -69,25 +72,40 @@ const mainMenuItems = [
   },
 ]
 
-const settingsMenuItem = {
-  id: "pengaturan",
-  label: "Pengaturan",
-  href: "/app/settings",
-  icon: Settings,
-  iconFilled: SettingsIcon,
-}
+const settingsMenuItems = [
+  {
+    id: "feedback",
+    label: "Feedback",
+    href: "/app/feedback",
+    icon: MessageSquare,
+    iconFilled: MessageSquareIcon,
+  },
+  {
+    id: "pengaturan",
+    label: "Pengaturan",
+    href: "/app/settings",
+    icon: Settings,
+    iconFilled: SettingsIcon,
+  },
+]
 
 export function StudentSidebar({ currentPage, onPageChange }: StudentSidebarProps) {
   const router = useRouter()
   const pathname = usePathname()
   const { theme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const [feedbackModalOpen, setFeedbackModalOpen] = useState(false)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  const handleMenuClick = (item: typeof mainMenuItems[0] | typeof settingsMenuItem) => {
+  const handleMenuClick = (item: typeof mainMenuItems[0] | typeof settingsMenuItems[0]) => {
+    if (item.id === "feedback") {
+      setFeedbackModalOpen(true)
+      return
+    }
+    
     onPageChange(item.label.toLowerCase())
     router.push(item.href)
   }
@@ -154,16 +172,16 @@ export function StudentSidebar({ currentPage, onPageChange }: StudentSidebarProp
         </div>
 
         {/* Settings at bottom */}
-        <div className="flex justify-center pb-4">
-          {(() => {
-            const active = isActive(settingsMenuItem.href)
-            const IconComponent = active ? settingsMenuItem.iconFilled : settingsMenuItem.icon
+        <div className="flex flex-col justify-center items-center space-y-3 pb-4">
+          {settingsMenuItems.map((item) => {
+            const active = item.id !== "feedback" && isActive(item.href)
+            const IconComponent = active ? item.iconFilled : item.icon
 
             return (
-              <Tooltip>
+              <Tooltip key={item.id}>
                 <TooltipTrigger asChild>
                   <button
-                    onClick={() => handleMenuClick(settingsMenuItem)}
+                    onClick={() => handleMenuClick(item)}
                     className={cn(
                       "p-2 rounded-lg transition-all duration-200 hover:bg-accent",
                       active
@@ -175,13 +193,19 @@ export function StudentSidebar({ currentPage, onPageChange }: StudentSidebarProp
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="right">
-                  <p>{settingsMenuItem.label}</p>
+                  <p>{item.label}</p>
                 </TooltipContent>
               </Tooltip>
             )
-          })()}
+          })}
         </div>
       </div>
+
+      {/* Feedback Modal */}
+      <FeedbackModal 
+        open={feedbackModalOpen} 
+        onOpenChange={setFeedbackModalOpen} 
+      />
     </TooltipProvider>
   )
 }
