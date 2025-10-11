@@ -27,6 +27,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { FeedbackModal } from "@/components/feedback-modal"
+import { CreatePopover } from "@/components/create-popover"
 
 interface StudentSidebarProps {
   currentPage: string
@@ -50,7 +51,7 @@ const mainMenuItems = [
   },
   {
     id: "tambah-project",
-    label: "Tambah Project",
+    label: "Buat Project/Blog",
     href: "/app/create/project",
     icon: Plus,
     iconFilled: Plus,
@@ -106,6 +107,11 @@ export function StudentSidebar({ currentPage, onPageChange }: StudentSidebarProp
       return
     }
     
+    // Don't navigate directly for the create menu item - let the popover handle it
+    if (item.id === "tambah-project") {
+      return
+    }
+    
     onPageChange(item.label.toLowerCase())
     router.push(item.href)
   }
@@ -136,6 +142,42 @@ export function StudentSidebar({ currentPage, onPageChange }: StudentSidebarProp
           {mainMenuItems.map((item) => {
             const active = isActive(item.href)
             const IconComponent = active ? item.iconFilled : item.icon
+
+            // Special handling for the create menu item with popover
+            if (item.id === "tambah-project") {
+              return (
+                <Tooltip key={item.id}>
+                  <CreatePopover onPageChange={onPageChange}>
+                    <TooltipTrigger asChild>
+                      <button
+                        className={cn(
+                          "p-2 rounded-lg transition-all duration-200 hover:bg-accent",
+                          item.isSpecial
+                            ? active
+                              ? "bg-white text-black"
+                              : "bg-muted text-muted-foreground hover:bg-muted/80"
+                            : active
+                            ? "text-foreground"
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                        suppressHydrationWarning
+                      >
+                        <IconComponent 
+                          size={20} 
+                          className={cn(
+                            item.isSpecial && active ? "text-black" : "",
+                            item.isSpecial && !active ? "text-white" : ""
+                          )}
+                        />
+                      </button>
+                    </TooltipTrigger>
+                  </CreatePopover>
+                  <TooltipContent side="right">
+                    <p>{item.label}</p>
+                  </TooltipContent>
+                </Tooltip>
+              )
+            }
 
             return (
               <Tooltip key={item.id}>
