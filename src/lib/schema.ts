@@ -161,6 +161,53 @@ export const feedback = pgTable('feedback', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+// Blogs table
+export const blogs = pgTable('blogs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  studentId: uuid('student_id').references(() => students.id).notNull(), // Who created the blog
+  title: varchar('title', { length: 255 }).notNull(), // Blog title
+  slug: varchar('slug', { length: 255 }).notNull().unique(), // URL-friendly slug
+  content: text('content').notNull(), // Blog content (HTML from Tiptap)
+  excerpt: text('excerpt'), // Short description/summary
+  thumbnailUrl: varchar('thumbnail_url', { length: 500 }), // Thumbnail image URL
+  status: varchar('status', { length: 20 }).default('draft').notNull(), // 'draft', 'published', 'archived'
+  tags: text('tags'), // JSON array of tags
+  readTime: integer('read_time'), // Estimated read time in minutes
+  viewCount: integer('view_count').default(0).notNull(), // Number of views
+  likeCount: integer('like_count').default(0).notNull(), // Number of likes
+  isPublic: boolean('is_public').default(true).notNull(), // Whether blog is public
+  publishedAt: timestamp('published_at'), // When the blog was published
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Blog Media table - for images and other media in blogs
+export const blogMedia = pgTable('blog_media', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  blogId: uuid('blog_id').references(() => blogs.id, { onDelete: 'cascade' }).notNull(), // Which blog this media belongs to
+  fileName: varchar('file_name', { length: 255 }).notNull(), // Original file name
+  fileUrl: varchar('file_url', { length: 500 }).notNull(), // Storage URL
+  fileType: varchar('file_type', { length: 100 }).notNull(), // MIME type
+  fileSize: integer('file_size').notNull(), // File size in bytes
+  alt: varchar('alt', { length: 255 }), // Alt text for images
+  caption: text('caption'), // Caption for media
+  order: integer('order').default(0).notNull(), // Display order
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Blog Likes table - for blog like system
+export const blogLikes = pgTable('blog_likes', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  blogId: uuid('blog_id').references(() => blogs.id, { onDelete: 'cascade' }).notNull(), // Which blog is liked
+  studentId: uuid('student_id').references(() => students.id).notNull(), // Who liked the blog
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  // Composite unique constraint to prevent duplicate likes from same student
+  uniqueBlogLike: unique().on(table.blogId, table.studentId),
+}));
+
 
 
 
@@ -195,6 +242,8 @@ export const studentsRelations = relations(students, ({ one, many }) => ({
   followers: many(studentFollows, { relationName: 'followers' }), // Students who follow this student
   following: many(studentFollows, { relationName: 'following' }), // Students this student follows
   feedback: many(feedback), // Feedback given by this student
+  blogs: many(blogs), // Blogs created by this student
+  blogLikes: many(blogLikes), // Blog likes by this student
 }));
 
 export const adminsRelations = relations(admins, ({ one }) => ({
@@ -312,6 +361,36 @@ export const projectLikeHistoryRelations = relations(projectLikeHistory, ({ one 
 export const feedbackRelations = relations(feedback, ({ one }) => ({
   student: one(students, {
     fields: [feedback.studentId],
+    references: [students.id],
+  }),
+}));
+
+// Blog relations
+export const blogsRelations = relations(blogs, ({ one, many }) => ({
+  student: one(students, {
+    fields: [blogs.studentId],
+    references: [students.id],
+  }),
+  blogMedia: many(blogMedia), // Media files for this blog
+  blogLikes: many(blogLikes), // Likes for this blog
+}));
+
+// Blog Media relations
+export const blogMediaRelations = relations(blogMedia, ({ one }) => ({
+  blog: one(blogs, {
+    fields: [blogMedia.blogId],
+    references: [blogs.id],
+  }),
+}));
+
+// Blog Likes relations
+export const blogLikesRelations = relations(blogLikes, ({ one }) => ({
+  blog: one(blogs, {
+    fields: [blogLikes.blogId],
+    references: [blogs.id],
+  }),
+  student: one(students, {
+    fields: [blogLikes.studentId],
     references: [students.id],
   }),
 }));

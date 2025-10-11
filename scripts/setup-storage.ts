@@ -58,6 +58,20 @@ const STORAGE_BUCKETS = [
     public: true,
     allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/webm'],
     fileSizeLimit: 50 * 1024 * 1024, // 50MB
+  },
+  {
+    name: 'blog-thumbnails',
+    description: 'Blog thumbnail images',
+    public: true,
+    allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+    fileSizeLimit: 10 * 1024 * 1024, // 10MB
+  },
+  {
+    name: 'blog-media',
+    description: 'Blog media files (images, videos, documents)',
+    public: true,
+    allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/webm', 'application/pdf'],
+    fileSizeLimit: 50 * 1024 * 1024, // 50MB
   }
 ];
 

@@ -22,6 +22,8 @@ export const STORAGE_BUCKETS = {
   TECHSTACK_ICONS: 'techstack-icons',
   PROJECT_THUMBNAILS: 'project-thumbnails',
   PROJECT_MEDIA: 'project-media',
+  BLOG_THUMBNAILS: 'blog-thumbnails',
+  BLOG_MEDIA: 'blog-media',
 } as const;
 
 // File upload utilities
@@ -177,6 +179,14 @@ export const FILE_VALIDATION_OPTIONS: Record<string, FileValidationOptions> = {
   },
   PROJECT_MEDIA: {
     allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/webm'],
+    maxSize: 50 * 1024 * 1024 // 50MB
+  },
+  BLOG_THUMBNAIL: {
+    allowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
+    maxSize: 10 * 1024 * 1024 // 10MB
+  },
+  BLOG_MEDIA: {
+    allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/webm', 'application/pdf'],
     maxSize: 50 * 1024 * 1024 // 50MB
   }
 } as const;
