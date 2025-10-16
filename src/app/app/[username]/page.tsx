@@ -68,7 +68,7 @@ interface Student {
 
 export default function StudentProfilePage() {
   const params = useParams()
-  const username = params.username as string
+  const username = params?.username as string
   const [student, setStudent] = useState<Student | null>(null)
   const [currentStudentId, setCurrentStudentId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
