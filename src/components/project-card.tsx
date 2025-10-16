@@ -258,16 +258,17 @@ export function ProjectCard(props: ProjectCardProps) {
 
         {/* Actions */}
         <CardFooter className="p-3 pt-0 flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onView(project as ProjectWithDetails)}
-            disabled={isLoading}
-            className="flex-1 h-8 font-medium text-xs"
-          >
-            <IconEye className="h-3.5 w-3.5 mr-1.5" />
-            View
-          </Button>
+          <Link href={`/admin/kelola-project/${project.id}`} className="flex-1">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={isLoading}
+              className="w-full h-8 font-medium text-xs"
+            >
+              <IconEye className="h-3.5 w-3.5 mr-1.5" />
+              View
+            </Button>
+          </Link>
           
           <Button
             variant="outline"
