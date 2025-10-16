@@ -127,7 +127,12 @@ export default function AdminProjectDetailPage() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset className="flex flex-col h-screen overflow-hidden">
-        <SiteHeader />
+        <SiteHeader 
+          breadcrumbItems={[
+            { label: 'Kelola Project', href: '/admin/kelola-project' },
+            { label: `${project.student.fullName} - ${project.title}` }
+          ]}
+        />
         <main className="@container/main flex flex-1 flex-col gap-6 p-6 overflow-y-auto">
           <div className="bg-background">
             {/* Back Button */}

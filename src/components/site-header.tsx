@@ -7,8 +7,14 @@ import { ModeToggle } from "@/components/mode-toggle"
 import { ChevronRight } from "lucide-react"
 import { usePathname } from "next/navigation"
 
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
 interface SiteHeaderProps {
   title?: string;
+  breadcrumbItems?: BreadcrumbItem[];
 }
 
 // Map of routes to their display names
@@ -22,7 +28,7 @@ const routeMap: Record<string, string> = {
   '/admin/kelola-skill': 'Kelola Skill',
 }
 
-export function SiteHeader({ title }: SiteHeaderProps) {
+export function SiteHeader({ title, breadcrumbItems }: SiteHeaderProps) {
   const pathname = usePathname()
   
   // Get the current page name from the route
@@ -41,7 +47,32 @@ export function SiteHeader({ title }: SiteHeaderProps) {
         <div className="flex items-center gap-2 text-sm">
           <span className="font-medium text-foreground">Panel Admin</span>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          <span className="font-medium text-muted-foreground">{currentPageName}</span>
+          
+          {breadcrumbItems && breadcrumbItems.length > 0 ? (
+            <>
+              {breadcrumbItems.map((item, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  {item.href ? (
+                    <a 
+                      href={item.href} 
+                      className="font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {item.label}
+                    </a>
+                  ) : (
+                    <span className={`font-medium ${index === breadcrumbItems.length - 1 ? 'text-foreground' : 'text-muted-foreground'}`}>
+                      {item.label}
+                    </span>
+                  )}
+                  {index < breadcrumbItems.length - 1 && (
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </div>
+              ))}
+            </>
+          ) : (
+            <span className="font-medium text-muted-foreground">{currentPageName}</span>
+          )}
         </div>
         
         <div className="ml-auto flex items-center gap-3">
