@@ -241,74 +241,7 @@ export function ProjectCard(props: ProjectCardProps) {
             </div>
           )}
 
-          {/* Tech Stacks */}
-          {(('techstacks' in project && project.techstacks) || ('projectTechstacks' in project && project.projectTechstacks)) && 
-           (('techstacks' in project && project.techstacks?.length > 0) || ('projectTechstacks' in project && project.projectTechstacks?.length > 0)) && (
-            <div className="space-y-2">
-              <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Tech Stack
-              </h4>
-              <div className="flex flex-wrap gap-1.5">
-                {(('techstacks' in project ? project.techstacks : project.projectTechstacks) || [])
-                  .slice(0, 4)
-                  .filter((pt: any) => pt.techstack && pt.techstack.name)
-                  .map((pt: any, index: number) => (
-                    <Badge 
-                      key={pt.techstack?.id || `techstack-${index}`} 
-                      variant="outline" 
-                      className="text-xs font-medium px-2.5 py-1 border-border/60"
-                      style={{
-                        backgroundColor: pt.techstack?.bgHex || undefined,
-                        borderColor: pt.techstack?.borderHex || undefined,
-                        color: pt.techstack?.textHex || undefined,
-                      }}
-                    >
-                      {pt.techstack?.name}
-                    </Badge>
-                  ))}
-                {(('techstacks' in project ? project.techstacks : project.projectTechstacks) || []).length > 4 && (
-                  <Badge variant="outline" className="text-xs font-medium px-2.5 py-1 text-muted-foreground">
-                    +{(('techstacks' in project ? project.techstacks : project.projectTechstacks) || []).length - 4}
-                  </Badge>
-                )}
-              </div>
-            </div>
-          )}
 
-          {/* Project Media Preview */}
-          {('projectMedia' in project ? project.projectMedia : project.media) && 
-           ('projectMedia' in project ? project.projectMedia : project.media).length > 0 && (
-            <div className="space-y-2">
-              <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Media ({('projectMedia' in project ? project.projectMedia : project.media).length})
-              </h4>
-              <div className="flex gap-2">
-                {('projectMedia' in project ? project.projectMedia : project.media).slice(0, 4).map((media: any, index: number) => (
-                  <div key={media.id || `media-${index}`} className="w-10 h-10 rounded-md overflow-hidden bg-muted border border-border/50">
-                    {media.mediaType === 'image' ? (
-                      <img 
-                        src={media.mediaUrl} 
-                        alt="Project media" 
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <video 
-                        src={media.mediaUrl} 
-                        className="w-full h-full object-cover"
-                      />
-                    )}
-                  </div>
-                ))}
-                {('projectMedia' in project ? project.projectMedia : project.media).length > 4 && (
-                  <div className="w-10 h-10 rounded-md bg-muted border border-border/50 flex items-center justify-center">
-                    <span className="text-xs font-medium text-muted-foreground">
-                      +{('projectMedia' in project ? project.projectMedia : project.media).length - 4}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Date */}
           <div className="flex items-center gap-2 text-xs text-muted-foreground pt-2 border-t border-border/30">
