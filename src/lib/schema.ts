@@ -161,6 +161,34 @@ export const feedback = pgTable('feedback', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+// Project Assessments table
+export const projectAssessments = pgTable('project_assessments', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  projectId: uuid('project_id').references(() => projects.id).notNull(),
+  assessorId: uuid('assessor_id').references(() => admins.id).notNull(), // Admin who assessed
+  // Assessment criteria scores (1-10 each)
+  codeQuality: integer('code_quality').notNull(), // Kualitas Kode
+  functionality: integer('functionality').notNull(), // Fungsionalitas
+  uiDesign: integer('ui_design').notNull(), // Desain UI
+  userExperience: integer('user_experience').notNull(), // User Experience
+  responsiveness: integer('responsiveness').notNull(), // Responsivitas
+  documentation: integer('documentation').notNull(), // Dokumentasi
+  creativity: integer('creativity').notNull(), // Kreativitas & Inovasi
+  technologyImplementation: integer('technology_implementation').notNull(), // Implementasi Teknologi
+  performance: integer('performance').notNull(), // Performa & Optimisasi
+  deployment: integer('deployment').notNull(), // Deployment & Live Demo
+  // Calculated fields
+  totalScore: integer('total_score').notNull(), // Sum of all criteria
+  finalGrade: varchar('final_grade', { length: 2 }).notNull(), // A, B, C, D, E based on total score
+  notes: text('notes'), // Additional assessment notes
+  status: varchar('status', { length: 20 }).default('completed').notNull(), // 'completed'
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  // Ensure one assessment per project
+  uniqueProjectAssessment: unique().on(table.projectId),
+}));
+
 
 
 
@@ -197,11 +225,12 @@ export const studentsRelations = relations(students, ({ one, many }) => ({
   feedback: many(feedback), // Feedback given by this student
 }));
 
-export const adminsRelations = relations(admins, ({ one }) => ({
+export const adminsRelations = relations(admins, ({ one, many }) => ({
   user: one(users, {
     fields: [admins.userId],
     references: [users.id],
   }),
+  assessments: many(projectAssessments), // Assessments done by this admin
 }));
 
 export const classesRelations = relations(classes, ({ many }) => ({
@@ -221,6 +250,7 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   projectMedia: many(projectMedia),
   projectLikes: many(projectLikes), // Likes for this project
   projectLikeHistory: many(projectLikeHistory), // Like history for this project
+  assessment: one(projectAssessments), // Assessment for this project
 }));
 
 export const categoriesRelations = relations(categories, ({ many }) => ({
@@ -313,5 +343,17 @@ export const feedbackRelations = relations(feedback, ({ one }) => ({
   student: one(students, {
     fields: [feedback.studentId],
     references: [students.id],
+  }),
+}));
+
+// Project Assessment relations
+export const projectAssessmentsRelations = relations(projectAssessments, ({ one }) => ({
+  project: one(projects, {
+    fields: [projectAssessments.projectId],
+    references: [projects.id],
+  }),
+  assessor: one(admins, {
+    fields: [projectAssessments.assessorId],
+    references: [admins.id],
   }),
 }));
