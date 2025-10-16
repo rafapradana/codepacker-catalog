@@ -153,46 +153,38 @@ export default function ProjectsPage() {
     <div className="min-h-screen bg-background">
       <GuestNavbar />
       
-      <main className="container mx-auto px-4 lg:px-16 xl:px-24 py-6">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Katalog Project
-          </h1>
-          <p className="text-muted-foreground">
-            Jelajahi berbagai project kreatif dan inovatif dari para siswa
+      <main className="container mx-auto px-4 lg:px-16 xl:px-24 py-8 pt-24">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-center mb-2">Project CodePacker</h1>
+          <p className="text-muted-foreground text-center mb-8">
+            Temukan project-project kreatif dan inovatif dari siswa CodePacker
           </p>
-        </div>
-
-        {/* Search and Filter */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          {/* Search Input */}
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              type="text"
-              placeholder="Cari project, deskripsi, atau nama siswa..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-
-          {/* Category Filter */}
-          <div className="w-full sm:w-64">
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger>
-                <SelectValue placeholder="Pilih kategori" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Kategori</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          
+          {/* Search and Filter */}
+          <div className="flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto mb-8">
+            <div className="flex-1">
+              <Input
+                placeholder="Cari project berdasarkan nama, deskripsi, atau teknologi..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div className="w-full sm:w-48">
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Filter Kategori" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Kategori</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 
