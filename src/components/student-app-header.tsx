@@ -40,7 +40,11 @@ export function StudentHeader({ currentPage, onPageChange }: StudentHeaderProps)
     <TooltipProvider>
       <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         {/* Desktop Header */}
-        <div className="hidden md:flex items-center justify-end h-full px-6">
+        <div className="hidden md:flex items-center justify-between h-full px-6">
+          <div></div> {/* Empty left space */}
+          <div className="flex items-center">
+            <h1 className="text-lg font-semibold text-foreground">Beranda</h1>
+          </div>
           <div className="flex items-center">
             <ModeToggle />
           </div>
@@ -59,9 +63,9 @@ export function StudentHeader({ currentPage, onPageChange }: StudentHeaderProps)
             />
           </div>
 
-          {/* Theme Toggle Center */}
+          {/* Title Center */}
           <div className="flex items-center">
-            <ModeToggle />
+            <h1 className="text-lg font-semibold text-foreground">Beranda</h1>
           </div>
 
           {/* Settings Right */}
