@@ -11,13 +11,11 @@ import {
   LayoutGrid, 
   UserRound, 
   MessageSquare,
-  Settings,
   HomeIcon,
   SearchIcon,
   LayoutGridIcon,
   UserRoundIcon,
   MessageSquareIcon,
-  SettingsIcon
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
@@ -79,13 +77,6 @@ const settingsMenuItems = [
     href: "/app/feedback",
     icon: MessageSquare,
     iconFilled: MessageSquareIcon,
-  },
-  {
-    id: "pengaturan",
-    label: "Pengaturan",
-    href: "/app/settings",
-    icon: Settings,
-    iconFilled: SettingsIcon,
   },
 ]
 
