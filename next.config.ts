@@ -20,6 +20,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Optimize for production deployment
+  output: 'standalone',
+  poweredByHeader: false,
+  compress: true,
 };
 
 export default nextConfig;
