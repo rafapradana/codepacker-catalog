@@ -6,11 +6,12 @@ import { eq } from 'drizzle-orm'
 // PATCH endpoint to update bookmark status
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { isBookmarked } = await request.json()
-    const ideaId = params.id
+    const resolvedParams = await params
+    const ideaId = resolvedParams.id
 
     if (typeof isBookmarked !== 'boolean') {
       return NextResponse.json(
@@ -57,10 +58,11 @@ export async function PATCH(
 // DELETE endpoint to delete a project idea
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const ideaId = params.id
+    const resolvedParams = await params
+    const ideaId = resolvedParams.id
 
     // Delete the project idea
     const deletedIdea = await db
