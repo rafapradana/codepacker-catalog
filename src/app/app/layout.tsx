@@ -20,6 +20,11 @@ export default function AppLayout({
     setCurrentPage(page)
   }
 
+  // Update currentPage when pathname changes
+  useEffect(() => {
+    setCurrentPage(pathname)
+  }, [pathname])
+
   // Initialize online status for logged-in user
   useEffect(() => {
     const initializeOnlineStatus = async () => {

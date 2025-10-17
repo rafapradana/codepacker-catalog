@@ -18,13 +18,18 @@ export function StudentHeader({ currentPage, onPageChange }: StudentHeaderProps)
     setMounted(true)
   }, [])
 
+  // Only show "Beranda" title when on the home/feed page
+  const showBerandaTitle = currentPage === '/app'
+
   return (
     <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       {/* Desktop Header */}
       <div className="hidden md:flex items-center justify-between h-full px-6">
         <div></div> {/* Empty left space */}
         <div className="flex items-center">
-          <h1 className="text-lg font-semibold text-foreground">Beranda</h1>
+          {showBerandaTitle && (
+            <h1 className="text-lg font-semibold text-foreground">Beranda</h1>
+          )}
         </div>
         <div className="flex items-center">
           <ModeToggle />
@@ -46,7 +51,9 @@ export function StudentHeader({ currentPage, onPageChange }: StudentHeaderProps)
 
         {/* Title Center */}
         <div className="flex items-center">
-          <h1 className="text-lg font-semibold text-foreground">Beranda</h1>
+          {showBerandaTitle && (
+            <h1 className="text-lg font-semibold text-foreground">Beranda</h1>
+          )}
         </div>
 
         {/* Right space for symmetry */}
