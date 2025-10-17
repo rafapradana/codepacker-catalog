@@ -174,7 +174,7 @@ export default function CodePackerCatalogFAQ() {
     ]
 
     return (
-        <section className="bg-muted py-20">
+        <section className="bg-background py-20">
             <div className="mx-auto max-w-5xl px-4 md:px-6">
                 <div className="flex flex-col gap-10 md:flex-row md:gap-16">
                     <div className="md:w-1/3">
@@ -194,7 +194,7 @@ export default function CodePackerCatalogFAQ() {
                                 <AccordionItem
                                     key={item.id}
                                     value={item.id}
-                                    className="bg-background shadow-xs rounded-lg border border-border px-4 last:border-b">
+                                    className="bg-card border border-border rounded-lg px-4 shadow-sm hover:shadow-md transition-shadow">
                                     <AccordionTrigger className="cursor-pointer items-center py-5 hover:no-underline">
                                         <div className="flex items-center gap-3">
                                             <div className="flex size-6">
