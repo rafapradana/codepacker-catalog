@@ -1,17 +1,17 @@
-import { HeroSection } from "@/components/hero-section-1";
-import AboutCodePackerCatalog from "@/components/features-1";
-import CodePackerMainFeatures from "@/components/features-8";
-import CodePackerCatalogFAQ from "@/components/faqs-3";
-import { RedirectHandler } from "@/components/redirect-handler";
+import { HeroSection } from "@/components/hero-section-1"
+import { TopProjects } from "@/components/top-projects"
+import { TopStudents } from "@/components/top-students"
+import AboutCodePackerCatalog from "@/components/features-1"
+import CodePackerCatalogFAQ from "@/components/faqs-3"
 
 export default function Home() {
   return (
-    <>
-      <RedirectHandler />
+    <main className="min-h-screen">
       <HeroSection />
       <AboutCodePackerCatalog />
-      <CodePackerMainFeatures />
+      <TopProjects />
+      <TopStudents />
       <CodePackerCatalogFAQ />
-    </>
-  );
+    </main>
+  )
 }
