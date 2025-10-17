@@ -40,6 +40,16 @@ export function HeroSection() {
                         <div className="mx-auto max-w-7xl px-6">
                             <div className="text-center">
                                 <AnimatedGroup variants={transitionVariants}>
+                                    {/* JHIC Logo - Organizer */}
+                                    <div className="flex justify-center mb-6">
+                                        <div className="flex items-center justify-center bg-background/80 backdrop-blur-sm rounded-lg px-6 py-3 border">
+                                            <img
+                                                src="/images/jhic-logo.png"
+                                                alt="JHIC Logo"
+                                                className="h-12 w-auto"
+                                            />
+                                        </div>
+                                    </div>
                                     <h1
                                         className="max-w-4xl mx-auto text-balance text-5xl md:text-6xl xl:text-[4.5rem] font-normal text-foreground">
                                         Katalog Project Siswa SMK Negeri 4 Malang

@@ -6,6 +6,7 @@ import { ProjectCard } from '@/components/project-card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search } from 'lucide-react';
+import { Footer } from '@/components/footer';
 
 interface Project {
   id: string;
@@ -231,6 +232,9 @@ export default function ProjectsPage() {
           </>
         )}
       </main>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

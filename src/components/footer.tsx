@@ -1,44 +1,82 @@
+"use client";
+
 import Link from "next/link";
 import { Github, Instagram, Mail } from "lucide-react";
+import Image from "next/image";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 interface FooterProps {
   className?: string;
 }
 
 export function Footer({ className = "" }: FooterProps) {
+  const { theme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Determine which logo to use based on theme
+  const logoSrc = mounted && (resolvedTheme === 'dark' || theme === 'dark') 
+    ? "/images/logos/codepacker-white.svg" 
+    : "/images/logos/codepacker-black.svg";
+
   return (
-    <footer className={`bg-gray-50 border-t border-gray-200 ${className}`}>
+    <footer className={`bg-background border-t border-border ${className}`}>
       <div className="container mx-auto px-6 md:px-12 lg:px-20 py-12">
         <div className="grid md:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">CP</span>
-              </div>
-              <span className="text-xl font-bold font-poppins text-blue-600">Codepacker</span>
+            <div className="flex items-center space-x-3 mb-4">
+              {mounted && (
+                <Image
+                  src={logoSrc}
+                  alt="Codepacker Catalog Logo"
+                  width={40}
+                  height={40}
+                  className="w-10 h-10"
+                  priority
+                  quality={100}
+                />
+              )}
+              <span className="text-xl font-bold font-poppins text-foreground">Codepacker Catalog</span>
             </div>
-            <p className="text-gray-600 text-sm font-inter leading-relaxed">
+            <p className="text-muted-foreground text-sm font-inter leading-relaxed mb-4">
               Platform modern untuk menampilkan katalog dan portofolio siswa RPL SMKN 4 Malang.
             </p>
+            {/* JHIC Logo */}
+            <div className="flex items-center space-x-3 mt-2">
+              <span className="text-sm text-muted-foreground">Penyelenggara:</span>
+              <Image
+                src="/images/jhic-logo.png"
+                alt="JHIC Logo"
+                width={160}
+                height={80}
+                className="h-12 w-auto object-contain"
+                quality={100}
+                priority
+              />
+            </div>
           </div>
 
           {/* Navigasi */}
           <div>
-            <h3 className="font-semibold mb-4 text-base font-poppins text-gray-900">Navigasi</h3>
+            <h3 className="font-semibold mb-4 text-base font-poppins text-foreground">Navigasi</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-inter">
+                <Link href="/" className="text-muted-foreground hover:text-primary transition-colors text-sm font-inter">
                   Beranda
                 </Link>
               </li>
               <li>
-                <Link href="/students" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-inter">
+                <Link href="/siswa" className="text-muted-foreground hover:text-primary transition-colors text-sm font-inter">
                   Siswa
                 </Link>
               </li>
               <li>
-                <Link href="/projects" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-inter">
+                <Link href="/projects" className="text-muted-foreground hover:text-primary transition-colors text-sm font-inter">
                   Projects
                 </Link>
               </li>
@@ -47,56 +85,56 @@ export function Footer({ className = "" }: FooterProps) {
 
           {/* Kategori */}
           <div>
-            <h3 className="font-semibold mb-4 text-base font-poppins text-gray-900">Kategori</h3>
+            <h3 className="font-semibold mb-4 text-base font-poppins text-foreground">Kategori</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/projects?category=web" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-inter">
+                <Link href="/projects?category=web" className="text-muted-foreground hover:text-primary transition-colors text-sm font-inter">
                   Web Development
                 </Link>
               </li>
               <li>
-                <Link href="/projects?category=mobile" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-inter">
+                <Link href="/projects?category=mobile" className="text-muted-foreground hover:text-primary transition-colors text-sm font-inter">
                   Mobile Development
                 </Link>
               </li>
               <li>
-                <Link href="/projects?category=game" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-inter">
+                <Link href="/projects?category=game" className="text-muted-foreground hover:text-primary transition-colors text-sm font-inter">
                   Game Development
                 </Link>
               </li>
               <li>
-                <Link href="/projects?category=desktop" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-inter">
+                <Link href="/projects?category=desktop" className="text-muted-foreground hover:text-primary transition-colors text-sm font-inter">
                   Desktop Application
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Kontak */}
+          {/* Kontak & Social Media */}
           <div>
-            <h3 className="font-semibold mb-4 text-base font-poppins text-gray-900">Kontak</h3>
+            <h3 className="font-semibold mb-4 text-base font-poppins text-foreground">Kontak & Social Media</h3>
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
-                <Mail className="w-4 h-4 text-gray-600" />
+                <Mail className="w-4 h-4 text-muted-foreground" />
                 <Link 
                   href="mailto:info@smkn4malang.sch.id"
-                  className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-inter"
+                  className="text-muted-foreground hover:text-primary transition-colors text-sm font-inter"
                 >
                   info@smkn4malang.sch.id
                 </Link>
               </div>
               <div className="flex items-center space-x-3 mt-4">
                 <Link 
-                  href="https://github.com/rafapradana/codepacker-catalog" 
+                  href="https://github.com/codepackerid" 
                   target="_blank"
-                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                  className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   <Github className="w-5 h-5" />
                 </Link>
                 <Link 
-                  href="https://instagram.com" 
+                  href="https://instagram.com/codepacker.catalog" 
                   target="_blank"
-                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                  className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   <Instagram className="w-5 h-5" />
                 </Link>
@@ -106,12 +144,12 @@ export function Footer({ className = "" }: FooterProps) {
         </div>
 
         {/* Bottom */}
-        <div className="border-t border-gray-200 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-600 text-sm font-inter">
-            © 2024 SMKN 4 Malang. All rights reserved.
+        <div className="border-t border-border mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-muted-foreground text-sm font-inter">
+            © 2025 SMKN 4 Malang. All rights reserved.
           </p>
-          <p className="text-gray-600 text-sm font-inter mt-2 md:mt-0">
-            Made with <span className="text-red-500">❤️</span> by RPL Students
+          <p className="text-muted-foreground text-sm font-inter mt-2 md:mt-0">
+            Made with <span className="text-red-500">❤️</span> by Sahabat Azril
           </p>
         </div>
       </div>

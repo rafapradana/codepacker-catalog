@@ -3,6 +3,7 @@ import { TopProjects } from "@/components/top-projects"
 import { TopStudents } from "@/components/top-students"
 import AboutCodePackerCatalog from "@/components/features-1"
 import CodePackerCatalogFAQ from "@/components/faqs-3"
+import { Footer } from "@/components/footer"
 
 export default function Home() {
   return (
@@ -12,6 +13,7 @@ export default function Home() {
       <TopProjects />
       <TopStudents />
       <CodePackerCatalogFAQ />
+      <Footer />
     </main>
   )
 }
