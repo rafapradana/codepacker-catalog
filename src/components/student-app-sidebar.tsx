@@ -11,12 +11,12 @@ import {
   LayoutGrid, 
   UserRound, 
   MessageSquare,
-  Brain,
   HomeIcon,
   SearchIcon,
   LayoutGridIcon,
   UserRoundIcon,
   MessageSquareIcon,
+  Sparkle,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
@@ -51,8 +51,8 @@ const mainMenuItems = [
     id: "ai-project-ideas",
     label: "AI-Powered Project Ideas Generator",
     href: "/app/ai-ideas",
-    icon: Brain,
-    iconFilled: Brain,
+    icon: Sparkle,
+    iconFilled: Sparkle,
   },
   {
     id: "tambah-project",
