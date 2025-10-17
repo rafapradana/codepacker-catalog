@@ -11,6 +11,7 @@ import {
   LayoutGrid, 
   UserRound, 
   MessageSquare,
+  Brain,
   HomeIcon,
   SearchIcon,
   LayoutGridIcon,
@@ -45,6 +46,13 @@ const mainMenuItems = [
     href: "/app/search",
     icon: Search,
     iconFilled: SearchIcon,
+  },
+  {
+    id: "ai-project-ideas",
+    label: "AI-Powered Project Ideas Generator",
+    href: "/app/ai-ideas",
+    icon: Brain,
+    iconFilled: Brain,
   },
   {
     id: "tambah-project",

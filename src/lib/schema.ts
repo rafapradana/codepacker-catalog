@@ -189,12 +189,21 @@ export const projectAssessments = pgTable('project_assessments', {
   uniqueProjectAssessment: unique().on(table.projectId),
 }));
 
-
-
-
-
-
-
+// AI Project Ideas table
+export const aiProjectIdeas = pgTable('ai_project_ideas', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  studentId: uuid('student_id').references(() => students.id).notNull(),
+  title: varchar('title', { length: 255 }).notNull(),
+  description: text('description').notNull(),
+  techStack: text('tech_stack').notNull(), // JSON array as text
+  difficulty: varchar('difficulty', { length: 50 }).notNull(), // 'easy', 'medium', 'hard'
+  estimatedHours: integer('estimated_hours'),
+  category: varchar('category', { length: 100 }),
+  features: text('features'), // JSON array as text
+  isBookmarked: boolean('is_bookmarked').default(false).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
 
 // Relations
 export const usersRelations = relations(users, ({ one }) => ({
@@ -223,6 +232,7 @@ export const studentsRelations = relations(students, ({ one, many }) => ({
   followers: many(studentFollows, { relationName: 'followers' }), // Students who follow this student
   following: many(studentFollows, { relationName: 'following' }), // Students this student follows
   feedback: many(feedback), // Feedback given by this student
+  aiProjectIdeas: many(aiProjectIdeas), // AI generated project ideas for this student
 }));
 
 export const adminsRelations = relations(admins, ({ one, many }) => ({
@@ -355,5 +365,13 @@ export const projectAssessmentsRelations = relations(projectAssessments, ({ one 
   assessor: one(admins, {
     fields: [projectAssessments.assessorId],
     references: [admins.id],
+  }),
+}));
+
+// AI Project Ideas Relations
+export const aiProjectIdeasRelations = relations(aiProjectIdeas, ({ one }) => ({
+  student: one(students, {
+    fields: [aiProjectIdeas.studentId],
+    references: [students.id],
   }),
 }));

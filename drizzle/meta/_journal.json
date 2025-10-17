@@ -57,6 +57,13 @@
       "when": 1760581772470,
       "tag": "0007_unknown_landau",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1760674372471,
+      "tag": "0008_wide_lethal_legion",
+      "breakpoints": true
     }
   ]
 }
