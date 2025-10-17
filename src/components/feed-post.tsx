@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { IconBrandGithub, IconExternalLink, IconCalendar } from "@tabler/icons-react"
+import { IconBrandGithub, IconExternalLink, IconCalendar, IconEye } from "@tabler/icons-react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -167,6 +167,17 @@ export function FeedPost({ project }: FeedPostProps) {
 
           {/* Action Buttons */}
           <div className="flex gap-2 pt-2">
+            <Button
+              asChild
+              size="sm"
+              variant="default"
+              className="flex-1 bg-primary hover:bg-primary/90"
+            >
+              <Link href={`/app/projects/${project.id}`}>
+                <IconEye className="h-4 w-4 mr-2" />
+                Lihat Detail Project
+              </Link>
+            </Button>
             <Button
               asChild
               size="sm"
