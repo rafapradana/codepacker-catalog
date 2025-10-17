@@ -47,6 +47,7 @@ import { Student } from "@/lib/students"
 import { Category } from "@/lib/categories"
 import { TechStack } from "@/lib/techstacks"
 import { ProjectCard } from "@/components/project-card"
+import { getStudentSession } from "@/lib/session"
 
 interface ProjectFormData {
   studentId: string
@@ -162,7 +163,7 @@ export function ProjectsDataTable() {
   }, [])
 
   // Filter and sort projects
-  const filteredProjects = projects.filter(project => {
+  const filteredProjects = (projects || []).filter(project => {
     if (!searchQuery) return true
     
     const query = searchQuery.toLowerCase()
@@ -284,6 +285,13 @@ export function ProjectsDataTable() {
       return
     }
 
+    // Get student session for authentication
+    const session = getStudentSession()
+    if (!session) {
+      toast.error("Please log in to create a project")
+      return
+    }
+
     setIsLoading(true)
     try {
       let thumbnailUrl = formData.thumbnailUrl
@@ -301,6 +309,7 @@ export function ProjectsDataTable() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.id}`,
         },
         body: JSON.stringify({
           ...formData,
@@ -523,7 +532,7 @@ export function ProjectsDataTable() {
       }
 
       toast.success("Project berhasil dihapus")
-      setProjects(projects.filter(p => p.id !== projectId))
+      setProjects((projects || []).filter(p => p.id !== projectId))
     } catch (error) {
       console.error('Delete error:', error)
       toast.error(error instanceof Error ? error.message : "Gagal menghapus project")
@@ -664,7 +673,13 @@ export function ProjectsDataTable() {
           }
         }}>
           <DialogTrigger asChild>
-            <Button onClick={() => console.log('Button clicked!')}>
+            <Button 
+              onClick={(e) => {
+                e.preventDefault()
+                console.log('Button clicked!')
+                setIsCreateDialogOpen(true)
+              }}
+            >
               <IconPlus className="mr-2 h-4 w-4" />
               Tambah Project
             </Button>
@@ -1368,8 +1383,8 @@ export function ProjectsDataTable() {
                   <div className="space-y-3">
                     <Label className="text-sm font-medium">Techstack yang Dipilih:</Label>
                     <div className="flex flex-wrap gap-2">
-                      {projectTechstacks.map((techstack) => (
-                        <Badge key={techstack.id} variant="outline" className="flex items-center gap-2 px-3 py-1">
+                      {projectTechstacks.map((techstack, index) => (
+                        <Badge key={`${techstack.techstack?.id || techstack.id}-${index}`} variant="outline" className="flex items-center gap-2 px-3 py-1">
                           {techstack.techstack?.iconUrl && (
                             <img src={techstack.techstack.iconUrl} alt={techstack.techstack.name || ''} className="w-4 h-4" />
                           )}

@@ -387,3 +387,25 @@ export async function removeStudentSkill(studentId: string, skillId: string) {
     return { success: false, error: "Failed to remove student skill" };
   }
 }
+
+export async function updateStudentSkills(studentId: string, skillIds: string[]) {
+  try {
+    // First delete all existing skills for the student
+    await db.delete(studentSkills).where(eq(studentSkills.studentId, studentId));
+    
+    // Then insert the new skills
+    if (skillIds.length > 0) {
+      const skillsToInsert = skillIds.map(skillId => ({
+        studentId,
+        skillId,
+      }));
+      
+      await db.insert(studentSkills).values(skillsToInsert);
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating student skills:', error);
+    return { success: false, error: "Failed to update student skills" };
+  }
+}

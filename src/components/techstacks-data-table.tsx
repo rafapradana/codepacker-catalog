@@ -517,7 +517,11 @@ export function TechStacksDataTable({ data: initialData }: TechStacksDataTablePr
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleEdit(techstack)}
+                        onClick={(e) => {
+                              e.preventDefault()
+                              console.log('Edit button clicked for techstack:', techstack.name)
+                              handleEdit(techstack)
+                            }}
                       >
                         <IconEdit className="h-4 w-4" />
                       </Button>

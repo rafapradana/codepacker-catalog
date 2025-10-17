@@ -452,7 +452,11 @@ export function CategoriesDataTable({ data }: CategoriesDataTableProps) {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => openEditDialog(category)}
+                        onClick={(e) => {
+                          e.preventDefault()
+                          console.log('Edit button clicked for category:', category.name)
+                          openEditDialog(category)
+                        }}
                         disabled={isLoading}
                       >
                         <IconEdit className="h-4 w-4" />

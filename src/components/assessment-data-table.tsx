@@ -243,7 +243,7 @@ export function AssessmentDataTable() {
             <div>
               <p className="text-sm text-muted-foreground">Sudah Dinilai</p>
               <p className="text-2xl font-bold">
-                {projects.filter(p => p.assessment).length}
+                {(projects || []).filter(p => p.assessment).length}
               </p>
             </div>
           </div>
@@ -257,7 +257,7 @@ export function AssessmentDataTable() {
             <div>
               <p className="text-sm text-muted-foreground">Belum Dinilai</p>
               <p className="text-2xl font-bold">
-                {projects.filter(p => !p.assessment).length}
+                {(projects || []).filter(p => !p.assessment).length}
               </p>
             </div>
           </div>

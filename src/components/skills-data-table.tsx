@@ -517,7 +517,11 @@ export function SkillsDataTable({ data: initialData }: SkillsDataTableProps) {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleEdit(skill)}
+                      onClick={(e) => {
+                              e.preventDefault()
+                              console.log('Edit button clicked for skill:', skill.name)
+                              handleEdit(skill)
+                            }}
                     >
                       <IconEdit className="h-4 w-4" />
                     </Button>

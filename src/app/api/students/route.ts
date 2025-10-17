@@ -13,7 +13,7 @@ const createStudentSchema = z.object({
   githubUrl: z.string().optional(),
   linkedinUrl: z.string().optional(),
   classId: z.string().nullable().optional(),
-  skillIds: z.array(z.string()).optional(),
+  skillIds: z.array(z.string().uuid()).optional(),
 });
 
 export async function GET(request: NextRequest) {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
-import { getStudentById, updateStudent, deleteStudent } from "@/lib/students"
+import { getStudentById, updateStudent, deleteStudent, updateStudentSkills } from "@/lib/students"
 
 const updateStudentSchema = z.object({
   username: z.string().min(1).optional(),
@@ -12,6 +12,7 @@ const updateStudentSchema = z.object({
   githubUrl: z.string().url().optional(),
   linkedinUrl: z.string().url().optional(),
   classId: z.string().uuid().optional(),
+  skillIds: z.array(z.string().uuid()).optional(),
 })
 
 export async function GET(
@@ -49,7 +50,10 @@ export async function PUT(
     
     const validatedData = updateStudentSchema.parse(body)
     
-    const student = await updateStudent(id, validatedData)
+    // Extract skillIds from validated data
+    const { skillIds, ...studentData } = validatedData
+    
+    const student = await updateStudent(id, studentData)
     
     if (!student) {
       return NextResponse.json(
@@ -58,7 +62,14 @@ export async function PUT(
       )
     }
     
-    return NextResponse.json(student)
+    // Update skills if skillIds are provided
+    if (skillIds !== undefined) {
+      await updateStudentSkills(id, skillIds)
+    }
+    
+    // Return the updated student with skills
+    const updatedStudent = await getStudentById(id)
+    return NextResponse.json(updatedStudent)
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
