@@ -89,6 +89,7 @@ export interface TopStudent {
   projectCount: number;
   avgAssessmentScore: number | null;
   totalLikes: number;
+  followingCount: number;
   followerCount: number;
 }
 
@@ -318,6 +319,10 @@ export async function getTopStudents(): Promise<TopStudent[]> {
           JOIN ${projects} ON ${projectLikes.projectId} = ${projects.id}
           WHERE ${projects.studentId} = ${students.id}
         ), 0)`,
+        followingCount: sql<number>`COALESCE((
+          SELECT COUNT(*) FROM ${studentFollows} 
+          WHERE ${studentFollows.followerId} = ${students.id}
+        ), 0)`,
         followerCount: sql<number>`COALESCE((
           SELECT COUNT(*) FROM ${studentFollows} 
           WHERE ${studentFollows.followingId} = ${students.id}
@@ -337,20 +342,13 @@ export async function getTopStudents(): Promise<TopStudent[]> {
       const projectQualityScore = student.avgAssessmentScore || 0;
       
       // 2. Activity Score (25%) - projects and engagement
-      const maxProjects = Math.max(...studentsData.map(s => s.projectCount), 1);
-      const maxLikes = Math.max(...studentsData.map(s => s.totalLikes), 1);
-      const activityScore = Math.min(
-        ((student.projectCount / maxProjects) * 50) + 
-        ((student.totalLikes / maxLikes) * 50), 
-        100
-      );
+      const activityScore = Math.min((student.projectCount * 20) + (student.totalLikes * 5), 100);
       
       // 3. Profile Completeness Score (15%)
       const profileScore = calculateProfileCompleteness(student);
       
-      // 4. Social Score (10%) - followers
-      const maxFollowers = Math.max(...studentsData.map(s => s.followerCount), 1);
-      const socialScore = Math.min((student.followerCount / maxFollowers) * 100, 100);
+      // 4. Social Score (10%) - followers and following
+      const socialScore = Math.min((student.followerCount * 3) + (student.followingCount * 1), 100);
       
       // Calculate final score
       const finalScore = (projectQualityScore * 0.5) + (activityScore * 0.25) + 
@@ -406,6 +404,7 @@ export async function getTopStudents(): Promise<TopStudent[]> {
           projectCount: student.projectCount,
           avgAssessmentScore: student.avgAssessmentScore,
           totalLikes: student.totalLikes,
+          followingCount: student.followingCount,
           followerCount: student.followerCount,
         };
       })
