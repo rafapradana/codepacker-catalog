@@ -7,14 +7,15 @@ import { TopTechStacksChart } from "@/components/dashboard/top-techstacks-chart"
 import { ClassPerformanceChart } from "@/components/dashboard/class-performance-chart";
 import { MonthlyTrendsChart } from "@/components/dashboard/monthly-trends-chart";
 import { getEnhancedDashboardStats } from "@/lib/enhanced-dashboard-stats";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 export default async function AdminDashboardPage() {
   const stats = await getEnhancedDashboardStats();
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-muted/40">
+    <SidebarProvider>
       <AppSidebar />
-      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
+      <SidebarInset>
         <SiteHeader />
         <main className="grid flex-1 items-start gap-6 p-4 sm:px-6 sm:py-0 md:gap-8">
           <div className="mx-auto grid max-w-[90rem] flex-1 auto-rows-max gap-6">
@@ -43,7 +44,7 @@ export default async function AdminDashboardPage() {
             <MonthlyTrendsChart stats={stats} />
           </div>
         </main>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
