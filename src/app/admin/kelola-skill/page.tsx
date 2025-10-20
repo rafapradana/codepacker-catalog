@@ -4,6 +4,8 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { SkillsDataTable } from "@/components/skills-data-table"
 import { getSkills } from "@/lib/skills"
 
+export const dynamic = 'force-dynamic'
+
 export default async function KelolaSkillPage() {
   const skills = await getSkills();
 

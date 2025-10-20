@@ -12,6 +12,8 @@ import { Github, ExternalLink, Calendar, User, FolderOpen, ArrowLeft } from 'luc
 import Image from 'next/image'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 interface Category {
   id: string
   name: string

@@ -4,6 +4,8 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { ClassesDataTable } from "@/components/classes-data-table"
 import { getClasses } from "@/lib/classes"
 
+export const dynamic = 'force-dynamic'
+
 export default async function KelolaKelasPage() {
   const classes = await getClasses();
 

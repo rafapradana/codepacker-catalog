@@ -4,6 +4,8 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { TechStacksDataTable } from "@/components/techstacks-data-table"
 import { getTechStacks } from "@/lib/techstacks"
 
+export const dynamic = 'force-dynamic'
+
 export default async function KelolaTechStackPage() {
   const techstacks = await getTechStacks();
 

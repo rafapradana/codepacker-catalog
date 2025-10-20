@@ -6,6 +6,8 @@ import {
 } from "@/components/ui/sidebar"
 import { FeedbackDataTable } from "@/components/feedback-data-table"
 
+export const dynamic = 'force-dynamic'
+
 export default async function FeedbackManagementPage() {
   return (
     <SidebarProvider>

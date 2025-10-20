@@ -3,6 +3,8 @@ import { SiteHeader } from "@/components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { AssessmentDataTable } from '@/components/assessment-data-table'
 
+export const dynamic = 'force-dynamic'
+
 export default function PenilaianProjectPage() {
   return (
     <SidebarProvider>

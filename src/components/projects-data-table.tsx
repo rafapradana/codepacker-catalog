@@ -357,7 +357,7 @@ export function ProjectsDataTable() {
       const projectsResponse = await fetch('/api/projects')
       if (projectsResponse.ok) {
         const updatedProjects = await projectsResponse.json()
-        setProjects(updatedProjects)
+        setProjects(updatedProjects.projects || [])
       }
     } catch (error) {
       console.error('Create error:', error)
@@ -442,7 +442,7 @@ export function ProjectsDataTable() {
       const projectsResponse = await fetch('/api/projects')
       if (projectsResponse.ok) {
         const updatedProjects = await projectsResponse.json()
-        setProjects(updatedProjects)
+        setProjects(updatedProjects.projects || [])
       }
     } catch (error) {
       console.error('Update error:', error)

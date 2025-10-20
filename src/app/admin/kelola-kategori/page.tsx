@@ -4,6 +4,8 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { CategoriesDataTable } from "@/components/categories-data-table"
 import { getCategories } from "@/lib/categories"
 
+export const dynamic = 'force-dynamic'
+
 export default async function KelolaKategoriPage() {
   const categories = await getCategories();
 
