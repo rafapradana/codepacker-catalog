@@ -1,16 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getTopStudents } from '@/lib/top-content';
-import { getCachedData } from '@/lib/cache';
 
 export async function GET() {
   try {
-    const topStudents = await getCachedData(
-      'top-students',
-      async () => {
-        return await getTopStudents();
-      },
-      'medium' // 1 hour cache
-    );
+    // Fetch data directly without caching for real-time updates
+    const topStudents = await getTopStudents();
 
     return NextResponse.json({
       success: true,
