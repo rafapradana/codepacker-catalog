@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { IconSearch, IconFilter, IconChevronDown } from "@tabler/icons-react"
+import { IconSearch, IconFilter, IconChevronDown, IconEye } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -28,6 +28,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
+import { FeedbackDetailModal } from "./feedback-detail-modal"
 
 interface FeedbackData {
   id: string
@@ -68,6 +69,8 @@ export function FeedbackDataTable() {
   const [sortBy, setSortBy] = React.useState<SortOption>("created-desc")
   const [currentPage, setCurrentPage] = React.useState(1)
   const [totalPages, setTotalPages] = React.useState(1)
+  const [selectedFeedback, setSelectedFeedback] = React.useState<FeedbackData | null>(null)
+  const [isDetailModalOpen, setIsDetailModalOpen] = React.useState(false)
   const itemsPerPage = 10
 
   const fetchFeedbacks = React.useCallback(async () => {
@@ -139,6 +142,16 @@ export function FeedbackDataTable() {
       console.error("Error updating status:", error)
       toast.error("Gagal memperbarui status feedback")
     }
+  }
+
+  const handleViewDetail = (feedback: FeedbackData) => {
+    setSelectedFeedback(feedback)
+    setIsDetailModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setSelectedFeedback(null)
+    setIsDetailModalOpen(false)
   }
 
   const filteredAndSortedFeedbacks = React.useMemo(() => {
@@ -239,6 +252,7 @@ export function FeedbackDataTable() {
               <TableHead>Feedback</TableHead>
               <TableHead>Tanggal</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -309,6 +323,16 @@ export function FeedbackDataTable() {
                       </Select>
                     </div>
                   </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleViewDetail(feedback)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <IconEye className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))
             )}
@@ -340,6 +364,15 @@ export function FeedbackDataTable() {
             </Button>
           </div>
         </div>
+      )}
+
+      {selectedFeedback && (
+        <FeedbackDetailModal
+          feedback={selectedFeedback}
+          isOpen={isDetailModalOpen}
+          onClose={handleCloseModal}
+          onStatusUpdate={handleStatusUpdate}
+        />
       )}
     </div>
   )
