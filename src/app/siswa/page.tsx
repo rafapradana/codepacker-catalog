@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Search, Filter, Users, GraduationCap, Loader2 } from 'lucide-react';
 import { StudentCard } from '@/components/student-card';
 import { GuestNavbar } from '@/components/guest-navbar';
+import { Footer } from '@/components/footer';
 
 interface Student {
   id: string;
@@ -242,6 +243,9 @@ export default function SiswaPage() {
           </>
         )}
       </main>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
