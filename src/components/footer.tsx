@@ -46,19 +46,6 @@ export function Footer({ className = "" }: FooterProps) {
             <p className="text-muted-foreground text-sm font-inter leading-relaxed mb-4">
               Platform modern untuk menampilkan katalog dan portofolio siswa RPL SMKN 4 Malang.
             </p>
-            {/* JHIC Logo */}
-            <div className="flex items-center space-x-3 mt-2">
-              <span className="text-sm text-muted-foreground">Penyelenggara:</span>
-              <Image
-                src="/images/jhic-logo.png"
-                alt="JHIC Logo"
-                width={160}
-                height={80}
-                className="h-12 w-auto object-contain"
-                quality={100}
-                priority
-              />
-            </div>
           </div>
 
           {/* Navigasi */}
