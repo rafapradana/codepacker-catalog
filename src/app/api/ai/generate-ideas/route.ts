@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { aiProjectIdeas, students } from '@/lib/schema';
 import { eq } from 'drizzle-orm';
-import { generateProjectIdeas, parseAIResponse, validateProjectIdea } from '@/lib/gemini';
+import { generateProjectIdeas, parseAIResponse, validateProjectIdea } from '@/lib/openrouter';
 
 interface GenerateIdeasRequest {
   studentId: string;
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
 
     // Validate and save ideas to database
     const savedIdeas = [];
-    
+
     if (parsedResponse.ideas && Array.isArray(parsedResponse.ideas)) {
       for (const idea of parsedResponse.ideas) {
         // Validate idea structure
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error generating project ideas:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to generate project ideas',
         details: error instanceof Error ? error.message : 'Unknown error'
       },

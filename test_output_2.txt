@@ -1,0 +1,18 @@
+C:\laragon\www\codepacker-catalog\node_modules\openai\src\client.ts:376
+      throw new Errors.OpenAIError(
+            ^
+
+
+OpenAIError: Missing credentials. Please pass an `apiKey`, or set the `OPENAI_API_KEY` environment variable.
+    at new OpenAI (C:\laragon\www\codepacker-catalog\node_modules\openai\src\client.ts:376:13)
+    at OpenAI (C:\laragon\www\codepacker-catalog\src\lib\openrouter.ts:4:27)
+    at Object.<anonymous> (C:\laragon\www\codepacker-catalog\src\lib\openrouter.ts:114:17)
+    at Module._compile (node:internal/modules/cjs/loader:1554:14)
+    at Object.transformer (C:\laragon\www\codepacker-catalog\node_modules\tsx\dist\register-D46fvsV_.cjs:3:1104)
+    at Module.load (node:internal/modules/cjs/loader:1289:32)
+    at Function._load (node:internal/modules/cjs/loader:1108:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:220:24)
+    at Module.require (node:internal/modules/cjs/loader:1311:12)
+
+Node.js v22.14.0
