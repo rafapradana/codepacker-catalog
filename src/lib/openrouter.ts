@@ -23,7 +23,7 @@ export const PROMPT_TEMPLATES = {
         category: string;
         difficulty: string;
     }) => `
-Sebagai AI assistant untuk platform pembelajaran coding, buatkan 3 ide proyek yang menarik dan relevan dengan kriteria berikut:
+Sebagai AI assistant untuk platform pembelajaran coding, tugasmu adalah membuatkan TEPAT 3 (TIGA) ide proyek yang menarik dan relevan.
 
 **Profil Siswa:**
 - Skill Level: ${params.skillLevel}
@@ -32,34 +32,50 @@ Sebagai AI assistant untuk platform pembelajaran coding, buatkan 3 ide proyek ya
 - Kategori proyek: ${params.category}
 - Tingkat kesulitan: ${params.difficulty}
 
-**Instruksi:**
-1. Buatkan 3 ide proyek yang unik dan menarik
-2. Setiap proyek harus sesuai dengan skill level dan tech stack yang diminta
-3. Estimasi waktu pengerjaan harus realistis sesuai dengan waktu yang tersedia
-4. Berikan deskripsi yang jelas dan menginspirasi
-5. Sertakan fitur-fitur utama yang akan dibangun
-6. Pastikan proyek dapat dikerjakan oleh siswa dengan skill level ${params.skillLevel}
+**Instruksi UTAMA:**
+1. WAJIB membuatkan 3 ide proyek. Tidak boleh kurang, tidak boleh lebih.
+2. Setiap proyek harus unik dan berbeda satu sama lain.
+3. Setiap proyek harus sesuai dengan skill level dan tech stack yang diminta.
+4. Estimasi waktu pengerjaan harus realistis sesuai dengan waktu yang tersedia.
 
 **Format Response (JSON):**
+Response HARUS berupa JSON valid dengan struktur persis seperti ini:
 {
   "ideas": [
     {
-      "title": "Nama Proyek",
-      "description": "Deskripsi lengkap proyek (2-3 kalimat yang menjelaskan tujuan dan manfaat proyek)",
-      "techStack": ["React", "Node.js", "PostgreSQL"],
+      "title": "Nama Proyek 1",
+      "description": "Deskripsi lengkap proyek 1...",
+      "techStack": ["Tech 1", "Tech 2"],
       "difficulty": "${params.difficulty}",
       "estimatedHours": 40,
       "category": "${params.category}",
-      "features": ["Feature 1", "Feature 2", "Feature 3", "Feature 4"]
+      "features": ["Feature 1", "Feature 2"]
+    },
+    {
+      "title": "Nama Proyek 2",
+      "description": "Deskripsi lengkap proyek 2...",
+      "techStack": ["Tech 1", "Tech 2"],
+      "difficulty": "${params.difficulty}",
+      "estimatedHours": 40,
+      "category": "${params.category}",
+      "features": ["Feature 1", "Feature 2"]
+    },
+    {
+      "title": "Nama Proyek 3",
+      "description": "Deskripsi lengkap proyek 3...",
+      "techStack": ["Tech 1", "Tech 2"],
+      "difficulty": "${params.difficulty}",
+      "estimatedHours": 40,
+      "category": "${params.category}",
+      "features": ["Feature 1", "Feature 2"]
     }
   ]
 }
 
 **Catatan Penting:**
-- Pastikan response HANYA berupa JSON yang valid
-- Jangan tambahkan teks apapun di luar JSON (seperti \`\`\`json atau \`\`\`)
-- Estimasi jam harus realistis (beginner: 20-40 jam, intermediate: 40-80 jam, advanced: 80-120 jam)
-- Fitur harus spesifik dan dapat diimplementasikan
+- Pastikan array "ideas" berisi TEPAT 3 objek.
+- Pastikan response HANYA berupa JSON yang valid.
+- Jangan tambahkan teks apapun di luar JSON.
 `
 };
 
