@@ -25,7 +25,8 @@ async function main() {
             difficulty: 'easy'
         });
         console.log('Success!');
-        console.log(ideas);
+        fs.writeFileSync('ai-response.json', JSON.stringify(JSON.parse(ideas), null, 2));
+        console.log('Response written to ai-response.json');
     } catch (error) {
         console.error('Test failed:', error);
     }

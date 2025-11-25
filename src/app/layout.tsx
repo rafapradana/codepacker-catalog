@@ -4,6 +4,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { DynamicFavicon } from "@/components/dynamic-favicon";
 
+import { Toaster } from "@/components/ui/sonner";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -75,6 +77,7 @@ export default function RootLayout({
         >
           <DynamicFavicon />
           {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
