@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils'
 import { ModeToggle } from '@/components/mode-toggle'
 import { isStudentLoggedIn, getStudentInfo } from '@/lib/session'
 
-
 const transitionVariants = {
     item: {
         hidden: {
