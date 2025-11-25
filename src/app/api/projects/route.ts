@@ -25,16 +25,16 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '12');
     const search = searchParams.get('search') || '';
     const categoryId = searchParams.get('categoryId') || '';
-    
+
     const offset = (page - 1) * limit;
 
     // Build where conditions
     const whereConditions = [];
-    
+
     if (search) {
       whereConditions.push(like(projects.title, `%${search}%`));
     }
-    
+
     if (categoryId) {
       whereConditions.push(eq(projects.categoryId, categoryId));
     }
@@ -86,16 +86,16 @@ export async function GET(request: NextRequest) {
       .select({ count: projects.id })
       .from(projects)
       .leftJoin(categories, eq(projects.categoryId, categories.id));
-    
+
     if (whereConditions.length > 0) {
       totalCountQuery.where(and(...whereConditions));
     }
-    
+
     const totalCount = (await totalCountQuery).length;
 
     // Get project IDs for fetching relations
     const projectIds = paginatedProjects.map(p => p.id);
-    
+
     if (projectIds.length === 0) {
       return NextResponse.json({
         projects: [],
@@ -137,7 +137,7 @@ export async function GET(request: NextRequest) {
     const projectsWithRelations = paginatedProjects.map(project => {
       const projectTechstacksList = allTechstacks.filter(pt => pt.projectId === project.id);
       const projectMediaList = allProjectMedia.filter(pm => pm.projectId === project.id);
-      
+
       return {
         ...project,
         techstacks: projectTechstacksList,
@@ -167,26 +167,12 @@ export async function GET(request: NextRequest) {
 
 // POST /api/projects - Create a new project
 export async function POST(request: NextRequest) {
-  return withStudentAuth(request, async (request, { user }) => {
+  return withStudentAuth(request, async (request, { user, student }) => {
     const body = await request.json();
     console.log('Request body:', JSON.stringify(body, null, 2));
-    
+
     // Validate request body
     const validatedData = createProjectSchema.parse(body);
-
-    // Verify student exists (using authenticated user ID)
-    const student = await db
-      .select({ id: students.id })
-      .from(students)
-      .where(eq(students.id, user.id))
-      .limit(1);
-
-    if (student.length === 0) {
-      return NextResponse.json(
-        { error: 'Student not found' },
-        { status: 404 }
-      );
-    }
 
     // Verify category exists if provided
     if (validatedData.categoryId) {
@@ -204,16 +190,40 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Separate project data from relations
+    const { techstackIds, mediaUrls, ...projectFields } = validatedData;
+
     // Create the project
     const [newProject] = await db
       .insert(projects)
       .values({
-        ...validatedData,
-        studentId: user.id, // Use authenticated user ID
+        ...projectFields,
+        studentId: student.id, // Use authenticated student ID
         createdAt: new Date(),
         updatedAt: new Date(),
       })
       .returning();
+
+    // Bulk insert tech stacks
+    if (techstackIds && techstackIds.length > 0) {
+      await db.insert(projectTechstacks).values(
+        techstackIds.map((techstackId) => ({
+          projectId: newProject.id,
+          techstackId: techstackId,
+        }))
+      );
+    }
+
+    // Bulk insert media URLs
+    if (mediaUrls && mediaUrls.length > 0) {
+      await db.insert(projectMedia).values(
+        mediaUrls.map((url) => ({
+          projectId: newProject.id,
+          mediaUrl: url,
+          mediaType: 'image',
+        }))
+      );
+    }
 
     return NextResponse.json(newProject, { status: 201 });
   });

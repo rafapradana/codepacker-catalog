@@ -56,7 +56,7 @@ export default function CreateProjectPage() {
       return;
     }
     setStudentSession(session);
-    
+
     // Load categories and techstacks from API
     loadCategories();
     loadTechstacks();
@@ -257,7 +257,7 @@ export default function CreateProjectPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -296,12 +296,15 @@ export default function CreateProjectPage() {
         categoryId: formData.categoryId || null,
         thumbnailUrl: thumbnailUrl,
         studentId: studentSession.studentId,
+        techstackIds: selectedTechstacks,
+        mediaUrls: mediaUrls,
       };
 
       const projectResponse = await fetch('/api/projects', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${studentSession.id}`,
         },
         body: JSON.stringify(projectData),
       });
@@ -311,59 +314,11 @@ export default function CreateProjectPage() {
         throw new Error(errorData.error || 'Failed to create project');
       }
 
-      const createdProject = await projectResponse.json();
-      const projectId = createdProject.id;
-
-      // Add tech stacks to project if selected
-      if (selectedTechstacks.length > 0) {
-        toast.loading('Menambahkan tech stacks...');
-        const techstackPromises = selectedTechstacks.map(async (techstackId) => {
-          const response = await fetch(`/api/projects/${projectId}/techstacks`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ techstackId }),
-          });
-
-          if (!response.ok) {
-            const errorData = await response.json();
-            console.error('Failed to add techstack:', errorData);
-          }
-        });
-
-        await Promise.all(techstackPromises);
-      }
-
-      // Add media files to project if uploaded
-      if (mediaUrls.length > 0) {
-        toast.loading('Menambahkan media files...');
-        const mediaPromises = mediaUrls.map(async (mediaUrl) => {
-          const response = await fetch(`/api/projects/${projectId}/media/direct`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-              mediaUrl: mediaUrl,
-              mediaType: 'image'
-            }),
-          });
-
-          if (!response.ok) {
-            const errorData = await response.json();
-            console.error('Failed to add media:', errorData);
-          }
-        });
-
-        await Promise.all(mediaPromises);
-      }
-
       toast.success('Project berhasil dibuat!');
-      
+
       // Redirect to project detail or projects list
       router.push('/app/projects');
-      
+
     } catch (error: any) {
       console.error('Error creating project:', error);
       toast.error(error.message || 'Gagal membuat project. Silakan coba lagi.');
@@ -377,251 +332,250 @@ export default function CreateProjectPage() {
       {/* Left Side - Form */}
       <div className="flex-1 overflow-y-auto p-6">
         <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
-            {/* Project Title */}
-            <div className="space-y-2">
-              <Label htmlFor="title" className="text-sm font-medium">
-                Judul Project <span className="text-red-500">*</span>
-              </Label>
+          {/* Project Title */}
+          <div className="space-y-2">
+            <Label htmlFor="title" className="text-sm font-medium">
+              Judul Project <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="title"
+              placeholder="Masukkan judul project..."
+              value={formData.title}
+              onChange={(e) => handleInputChange('title', e.target.value)}
+              required
+            />
+          </div>
+
+          {/* Project Description */}
+          <div className="space-y-2">
+            <Label htmlFor="description" className="text-sm font-medium">
+              Deskripsi Project
+            </Label>
+            <Textarea
+              id="description"
+              placeholder="Ceritakan tentang project ini..."
+              rows={4}
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+            />
+          </div>
+
+          {/* GitHub URL */}
+          <div className="space-y-2">
+            <Label htmlFor="githubUrl" className="text-sm font-medium">
+              GitHub Repository <span className="text-red-500">*</span>
+            </Label>
+            <div className="relative">
+              <Github className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                id="title"
-                placeholder="Masukkan judul project..."
-                value={formData.title}
-                onChange={(e) => handleInputChange('title', e.target.value)}
+                id="githubUrl"
+                placeholder="https://github.com/username/repository"
+                className="pl-10"
+                value={formData.githubUrl}
+                onChange={(e) => handleInputChange('githubUrl', e.target.value)}
                 required
               />
             </div>
+          </div>
 
-            {/* Project Description */}
-            <div className="space-y-2">
-              <Label htmlFor="description" className="text-sm font-medium">
-                Deskripsi Project
-              </Label>
-              <Textarea
-                id="description"
-                placeholder="Ceritakan tentang project ini..."
-                rows={4}
-                value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
+          {/* Live Demo URL */}
+          <div className="space-y-2">
+            <Label htmlFor="liveDemoUrl" className="text-sm font-medium">
+              Live Demo URL
+            </Label>
+            <div className="relative">
+              <ExternalLink className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                id="liveDemoUrl"
+                placeholder="https://your-project-demo.com"
+                className="pl-10"
+                value={formData.liveDemoUrl}
+                onChange={(e) => handleInputChange('liveDemoUrl', e.target.value)}
               />
             </div>
+          </div>
 
-            {/* GitHub URL */}
-            <div className="space-y-2">
-              <Label htmlFor="githubUrl" className="text-sm font-medium">
-                GitHub Repository <span className="text-red-500">*</span>
-              </Label>
-              <div className="relative">
-                <Github className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  id="githubUrl"
-                  placeholder="https://github.com/username/repository"
-                  className="pl-10"
-                  value={formData.githubUrl}
-                  onChange={(e) => handleInputChange('githubUrl', e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Live Demo URL */}
-            <div className="space-y-2">
-              <Label htmlFor="liveDemoUrl" className="text-sm font-medium">
-                Live Demo URL
-              </Label>
-              <div className="relative">
-                <ExternalLink className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  id="liveDemoUrl"
-                  placeholder="https://your-project-demo.com"
-                  className="pl-10"
-                  value={formData.liveDemoUrl}
-                  onChange={(e) => handleInputChange('liveDemoUrl', e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* Category Selection */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Kategori Project</Label>
-              <Select value={formData.categoryId} onValueChange={(value) => handleInputChange('categoryId', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih kategori project" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: category.bgHex }}
-                        />
-                        {category.name}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Tech Stack Selection */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">Tech Stack</Label>
-              <div className="grid grid-cols-2 gap-2">
-                {techstacks.map((tech) => (
-                  <div
-                    key={tech.id}
-                    className={`p-3 rounded-lg border cursor-pointer transition-all ${
-                      selectedTechstacks.includes(tech.id)
-                        ? 'border-primary bg-primary/10'
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                    onClick={() => handleTechstackToggle(tech.id)}
-                  >
+          {/* Category Selection */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Kategori Project</Label>
+            <Select value={formData.categoryId} onValueChange={(value) => handleInputChange('categoryId', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Pilih kategori project" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
                     <div className="flex items-center gap-2">
                       <div
                         className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: tech.bgHex }}
+                        style={{ backgroundColor: category.bgHex }}
                       />
-                      <span className="text-sm font-medium">{tech.name}</span>
+                      {category.name}
                     </div>
-                  </div>
+                  </SelectItem>
                 ))}
-              </div>
-              
-              {/* Selected Tech Stacks */}
-              {selectedTechstacks.length > 0 && (
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">Tech Stack Terpilih:</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedTechstacks.map((techId) => {
-                      const tech = techstacks.find(t => t.id === techId);
-                      return tech ? (
-                        <Badge
-                          key={techId}
-                          variant="secondary"
-                          className="flex items-center gap-1"
-                          style={{
-                            backgroundColor: tech.bgHex,
-                            borderColor: tech.borderHex,
-                            color: tech.textHex,
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Tech Stack Selection */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">Tech Stack</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {techstacks.map((tech) => (
+                <div
+                  key={tech.id}
+                  className={`p-3 rounded-lg border cursor-pointer transition-all ${selectedTechstacks.includes(tech.id)
+                    ? 'border-primary bg-primary/10'
+                    : 'border-border hover:border-primary/50'
+                    }`}
+                  onClick={() => handleTechstackToggle(tech.id)}
+                >
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: tech.bgHex }}
+                    />
+                    <span className="text-sm font-medium">{tech.name}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Selected Tech Stacks */}
+            {selectedTechstacks.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Tech Stack Terpilih:</Label>
+                <div className="flex flex-wrap gap-2">
+                  {selectedTechstacks.map((techId) => {
+                    const tech = techstacks.find(t => t.id === techId);
+                    return tech ? (
+                      <Badge
+                        key={techId}
+                        variant="secondary"
+                        className="flex items-center gap-1"
+                        style={{
+                          backgroundColor: tech.bgHex,
+                          borderColor: tech.borderHex,
+                          color: tech.textHex,
+                        }}
+                      >
+                        {tech.name}
+                        <X
+                          className="w-3 h-3 cursor-pointer hover:opacity-70"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleTechstackToggle(techId);
                           }}
-                        >
-                          {tech.name}
-                          <X
-                            className="w-3 h-3 cursor-pointer hover:opacity-70"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleTechstackToggle(techId);
-                            }}
-                          />
-                        </Badge>
-                      ) : null;
-                    })}
-                  </div>
+                        />
+                      </Badge>
+                    ) : null;
+                  })}
                 </div>
-              )}
-            </div>
-
-            {/* Thumbnail Upload */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Thumbnail Project</Label>
-              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-                <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground mb-2">
-                  Upload thumbnail project (opsional)
-                </p>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleThumbnailUpload}
-                  className="hidden"
-                  id="thumbnail-upload"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => document.getElementById('thumbnail-upload')?.click()}
-                >
-                  Pilih File
-                </Button>
-                {formData.thumbnailFile && (
-                  <p className="text-xs text-muted-foreground mt-2">
-                    File terpilih: {formData.thumbnailFile.name}
-                  </p>
-                )}
               </div>
-            </div>
+            )}
+          </div>
 
-            {/* Media Upload */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Media Project</Label>
-              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-                <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground mb-2">
-                  Upload gambar project (opsional)
-                </p>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleMediaUpload}
-                  className="hidden"
-                  id="media-upload"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => document.getElementById('media-upload')?.click()}
-                >
-                  Pilih File
-                </Button>
-              </div>
-              
-              {/* Selected Media Files */}
-              {formData.mediaFiles.length > 0 && (
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">File Media Terpilih:</Label>
-                  <div className="space-y-1">
-                    {formData.mediaFiles.map((file, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
-                        <span className="text-xs truncate">{file.name}</span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeMediaFile(index)}
-                        >
-                          <X className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Submit Button */}
-            <div className="pt-4">
-              <Button 
-                type="submit" 
-                className="w-full" 
-                size="lg"
-                disabled={isLoading}
+          {/* Thumbnail Upload */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Thumbnail Project</Label>
+            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+              <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground mb-2">
+                Upload thumbnail project (opsional)
+              </p>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleThumbnailUpload}
+                className="hidden"
+                id="thumbnail-upload"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => document.getElementById('thumbnail-upload')?.click()}
               >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Membuat Project...
-                  </>
-                ) : (
-                  'Buat Project'
-                )}
+                Pilih File
+              </Button>
+              {formData.thumbnailFile && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  File terpilih: {formData.thumbnailFile.name}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Media Upload */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Media Project</Label>
+            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+              <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground mb-2">
+                Upload gambar project (opsional)
+              </p>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleMediaUpload}
+                className="hidden"
+                id="media-upload"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => document.getElementById('media-upload')?.click()}
+              >
+                Pilih File
               </Button>
             </div>
-          </form>
-        </div>
+
+            {/* Selected Media Files */}
+            {formData.mediaFiles.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">File Media Terpilih:</Label>
+                <div className="space-y-1">
+                  {formData.mediaFiles.map((file, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
+                      <span className="text-xs truncate">{file.name}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeMediaFile(index)}
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <div className="pt-4">
+            <Button
+              type="submit"
+              className="w-full"
+              size="lg"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Membuat Project...
+                </>
+              ) : (
+                'Buat Project'
+              )}
+            </Button>
+          </div>
+        </form>
+      </div>
 
       {/* Vertical Separator - Fixed in center */}
       <div className="flex items-center justify-center">
@@ -631,7 +585,7 @@ export default function CreateProjectPage() {
       {/* Right Side - Preview */}
       <div className="flex-1 flex flex-col items-center justify-center h-screen overflow-hidden p-6">
         <div className="w-full max-w-sm h-full flex items-center justify-center">
-          
+
           {/* Live Project Card Preview */}
           <div className="w-full max-h-full overflow-hidden">
             <div className="group relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 border border-border/50 shadow-sm h-full flex flex-col py-0 rounded-lg bg-card">
@@ -656,11 +610,11 @@ export default function CreateProjectPage() {
                     </div>
                   </div>
                 )}
-                
+
                 {/* Category Badge */}
                 {formData.categoryId && (
-                  <Badge 
-                    variant="secondary" 
+                  <Badge
+                    variant="secondary"
                     className="absolute top-2 left-2 text-xs font-medium shadow-sm backdrop-blur-sm"
                     style={{
                       backgroundColor: categories.find(c => c.id === formData.categoryId)?.bgHex || undefined,
