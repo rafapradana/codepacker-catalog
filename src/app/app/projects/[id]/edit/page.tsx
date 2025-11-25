@@ -37,10 +37,10 @@ interface Project {
   thumbnailUrl: string | null;
   categoryId: string | null;
   studentId: string;
-  projectTechstacks: Array<{
+  techstacks: Array<{
     techstackId: string;
   }>;
-  projectMedia: Array<{
+  media: Array<{
     mediaUrl: string;
   }>;
 }
@@ -120,7 +120,7 @@ export default function EditProjectPage() {
         }
 
         const projectData = await response.json();
-        
+
         // Check if the project belongs to the current student
         if (projectData.student?.userId !== studentSession.id) {
           toast.error('Anda tidak memiliki akses untuk mengedit project ini');
@@ -129,7 +129,7 @@ export default function EditProjectPage() {
         }
 
         setProject(projectData);
-        
+
         // Set form data
         setFormData({
           title: projectData.title || '',
@@ -137,13 +137,13 @@ export default function EditProjectPage() {
           githubUrl: projectData.githubUrl || '',
           liveDemoUrl: projectData.liveDemoUrl || '',
           categoryId: projectData.categoryId || '',
-          techstackIds: projectData.projectTechstacks?.map((pt: any) => pt.techstackId) || [],
+          techstackIds: projectData.techstacks?.map((pt: any) => pt.techstackId) || [],
           thumbnailFile: null,
           mediaFiles: []
         });
 
         // Set selected techstacks
-        setSelectedTechstacks(projectData.projectTechstacks?.map((pt: any) => pt.techstackId) || []);
+        setSelectedTechstacks(projectData.techstacks?.map((pt: any) => pt.techstackId) || []);
 
       } catch (error) {
         console.error('Error loading project:', error);
@@ -242,7 +242,7 @@ export default function EditProjectPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title.trim()) {
       toast.error('Judul project harus diisi');
       return;
@@ -322,344 +322,343 @@ export default function EditProjectPage() {
       {/* Left Side - Form */}
       <div className="flex-1 overflow-y-auto p-6">
         <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
-            {/* Project Title */}
-            <div className="space-y-2">
-              <Label htmlFor="title" className="text-sm font-medium">
-                Judul Project <span className="text-red-500">*</span>
-              </Label>
+          {/* Project Title */}
+          <div className="space-y-2">
+            <Label htmlFor="title" className="text-sm font-medium">
+              Judul Project <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="title"
+              placeholder="Masukkan judul project..."
+              value={formData.title}
+              onChange={(e) => handleInputChange('title', e.target.value)}
+              required
+            />
+          </div>
+
+          {/* Project Description */}
+          <div className="space-y-2">
+            <Label htmlFor="description" className="text-sm font-medium">
+              Deskripsi Project
+            </Label>
+            <Textarea
+              id="description"
+              placeholder="Ceritakan tentang project ini..."
+              rows={4}
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+            />
+          </div>
+
+          {/* GitHub URL */}
+          <div className="space-y-2">
+            <Label htmlFor="github" className="text-sm font-medium">
+              GitHub Repository <span className="text-red-500">*</span>
+            </Label>
+            <div className="relative">
+              <Github className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                id="title"
-                placeholder="Masukkan judul project..."
-                value={formData.title}
-                onChange={(e) => handleInputChange('title', e.target.value)}
+                id="github"
+                placeholder="https://github.com/username/repository"
+                className="pl-10"
+                value={formData.githubUrl}
+                onChange={(e) => handleInputChange('githubUrl', e.target.value)}
                 required
               />
             </div>
+          </div>
 
-            {/* Project Description */}
-            <div className="space-y-2">
-              <Label htmlFor="description" className="text-sm font-medium">
-                Deskripsi Project
-              </Label>
-              <Textarea
-                id="description"
-                placeholder="Ceritakan tentang project ini..."
-                rows={4}
-                value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
+          {/* Live Demo URL */}
+          <div className="space-y-2">
+            <Label htmlFor="demo" className="text-sm font-medium">
+              Live Demo URL
+            </Label>
+            <div className="relative">
+              <ExternalLink className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                id="demo"
+                placeholder="https://your-project-demo.com"
+                className="pl-10"
+                value={formData.liveDemoUrl}
+                onChange={(e) => handleInputChange('liveDemoUrl', e.target.value)}
               />
             </div>
+          </div>
 
-            {/* GitHub URL */}
-            <div className="space-y-2">
-              <Label htmlFor="github" className="text-sm font-medium">
-                GitHub Repository <span className="text-red-500">*</span>
-              </Label>
-              <div className="relative">
-                <Github className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  id="github"
-                  placeholder="https://github.com/username/repository"
-                  className="pl-10"
-                  value={formData.githubUrl}
-                  onChange={(e) => handleInputChange('githubUrl', e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Live Demo URL */}
-            <div className="space-y-2">
-              <Label htmlFor="demo" className="text-sm font-medium">
-                Live Demo URL
-              </Label>
-              <div className="relative">
-                <ExternalLink className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  id="demo"
-                  placeholder="https://your-project-demo.com"
-                  className="pl-10"
-                  value={formData.liveDemoUrl}
-                  onChange={(e) => handleInputChange('liveDemoUrl', e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* Category Selection */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">
-                Kategori Project <span className="text-red-500">*</span>
-              </Label>
-              <Select value={formData.categoryId} onValueChange={(value) => handleInputChange('categoryId', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih kategori project" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      <div className="flex items-center gap-2">
-                        <div 
-                          className="w-3 h-3 rounded-full" 
-                          style={{ backgroundColor: category.bgHex }}
-                        />
-                        {category.name}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Tech Stack Selection */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">
-                Tech Stack <span className="text-red-500">*</span>
-              </Label>
-              <div className="grid grid-cols-2 gap-2">
-                {techstacks.map((tech) => (
-                  <div
-                    key={tech.id}
-                    className={`p-3 rounded-lg border cursor-pointer transition-all ${
-                      selectedTechstacks.includes(tech.id)
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                    onClick={() => handleTechstackToggle(tech.id)}
-                  >
+          {/* Category Selection */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">
+              Kategori Project <span className="text-red-500">*</span>
+            </Label>
+            <Select value={formData.categoryId} onValueChange={(value) => handleInputChange('categoryId', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Pilih kategori project" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
                     <div className="flex items-center gap-2">
-                      <div 
-                        className="w-3 h-3 rounded-full" 
-                        style={{ backgroundColor: tech.bgHex }}
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: category.bgHex }}
                       />
-                      <span className="text-sm font-medium">{tech.name}</span>
+                      {category.name}
                     </div>
-                  </div>
+                  </SelectItem>
                 ))}
-              </div>
+              </SelectContent>
+            </Select>
+          </div>
 
-              {/* Selected Tech Stacks */}
-              {selectedTechstacks.length > 0 && (
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">Tech Stack Terpilih:</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedTechstacks.map((techId) => {
-                      const tech = techstacks.find(t => t.id === techId);
-                      if (!tech) return null;
-                      return (
-                        <Badge
-                          key={techId}
-                          variant="secondary"
-                          className="text-xs"
-                          style={{
-                            backgroundColor: tech.bgHex,
-                            borderColor: tech.borderHex,
-                            color: tech.textHex,
+          {/* Tech Stack Selection */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">
+              Tech Stack <span className="text-red-500">*</span>
+            </Label>
+            <div className="grid grid-cols-2 gap-2">
+              {techstacks.map((tech) => (
+                <div
+                  key={tech.id}
+                  className={`p-3 rounded-lg border cursor-pointer transition-all ${selectedTechstacks.includes(tech.id)
+                      ? 'border-primary bg-primary/5'
+                      : 'border-border hover:border-primary/50'
+                    }`}
+                  onClick={() => handleTechstackToggle(tech.id)}
+                >
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: tech.bgHex }}
+                    />
+                    <span className="text-sm font-medium">{tech.name}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Selected Tech Stacks */}
+            {selectedTechstacks.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Tech Stack Terpilih:</Label>
+                <div className="flex flex-wrap gap-2">
+                  {selectedTechstacks.map((techId) => {
+                    const tech = techstacks.find(t => t.id === techId);
+                    if (!tech) return null;
+                    return (
+                      <Badge
+                        key={techId}
+                        variant="secondary"
+                        className="text-xs"
+                        style={{
+                          backgroundColor: tech.bgHex,
+                          borderColor: tech.borderHex,
+                          color: tech.textHex,
+                        }}
+                      >
+                        {tech.name}
+                        <X
+                          className="w-3 h-3 ml-1 cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleTechstackToggle(techId);
                           }}
-                        >
-                          {tech.name}
-                          <X 
-                            className="w-3 h-3 ml-1 cursor-pointer" 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleTechstackToggle(techId);
-                            }}
-                          />
-                        </Badge>
-                      );
-                    })}
-                  </div>
+                        />
+                      </Badge>
+                    );
+                  })}
                 </div>
-              )}
-            </div>
-
-            {/* Thumbnail Upload */}
-            <div className="space-y-4">
-              <Label className="text-sm font-medium">Thumbnail Project</Label>
-              
-              {/* Current Thumbnail Display */}
-              {project?.thumbnailUrl && !thumbnailDeleted && (
-                <div className="space-y-3">
-                  <Label className="text-xs text-muted-foreground">Thumbnail Saat Ini:</Label>
-                  <div className="relative inline-block group">
-                    <div className="aspect-video w-48 rounded-lg overflow-hidden border bg-muted">
-                      <Image
-                        src={project.thumbnailUrl}
-                        alt="Current thumbnail"
-                        width={192}
-                        height={108}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="sm"
-                      className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={handleDeleteThumbnail}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </div>
-              )}
-              
-              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-                <input
-                  type="file"
-                  id="thumbnail-upload"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleThumbnailUpload}
-                />
-                <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground mb-2">
-                  {project?.thumbnailUrl ? 'Upload thumbnail baru untuk mengganti (maksimal 5MB)' : 'Klik untuk upload thumbnail (maksimal 5MB)'}
-                </p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => document.getElementById('thumbnail-upload')?.click()}
-                >
-                  {project?.thumbnailUrl ? 'Ganti Thumbnail' : 'Pilih File'}
-                </Button>
               </div>
-              
-              {/* New Thumbnail Preview */}
-              {formData.thumbnailFile && (
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">Thumbnail Baru Terpilih:</Label>
-                  <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-12 h-8 bg-background rounded border flex items-center justify-center">
-                        <Upload className="h-3 w-3 text-muted-foreground" />
-                      </div>
-                      <span className="text-sm truncate">{formData.thumbnailFile.name}</span>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setFormData(prev => ({ ...prev, thumbnailFile: null }))}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+            )}
+          </div>
+
+          {/* Thumbnail Upload */}
+          <div className="space-y-4">
+            <Label className="text-sm font-medium">Thumbnail Project</Label>
+
+            {/* Current Thumbnail Display */}
+            {project?.thumbnailUrl && !thumbnailDeleted && (
+              <div className="space-y-3">
+                <Label className="text-xs text-muted-foreground">Thumbnail Saat Ini:</Label>
+                <div className="relative inline-block group">
+                  <div className="aspect-video w-48 rounded-lg overflow-hidden border bg-muted">
+                    <Image
+                      src={project.thumbnailUrl}
+                      alt="Current thumbnail"
+                      width={192}
+                      height={108}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={handleDeleteThumbnail}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
                 </div>
-              )}
+              </div>
+            )}
+
+            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+              <input
+                type="file"
+                id="thumbnail-upload"
+                accept="image/*"
+                className="hidden"
+                onChange={handleThumbnailUpload}
+              />
+              <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground mb-2">
+                {project?.thumbnailUrl ? 'Upload thumbnail baru untuk mengganti (maksimal 5MB)' : 'Klik untuk upload thumbnail (maksimal 5MB)'}
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => document.getElementById('thumbnail-upload')?.click()}
+              >
+                {project?.thumbnailUrl ? 'Ganti Thumbnail' : 'Pilih File'}
+              </Button>
             </div>
 
-            {/* Media Upload */}
-            <div className="space-y-4">
-              <Label className="text-sm font-medium">Media Project (Opsional)</Label>
-              
-              {/* Current Media Display */}
-              {project?.projectMedia && project.projectMedia.length > 0 && (
-                <div className="space-y-3">
-                  <Label className="text-xs text-muted-foreground">Media Saat Ini:</Label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {project.projectMedia.map((media, index) => (
-                      !mediaDeleted.includes(index) && (
-                        <div key={index} className="relative group">
-                          <div className="aspect-video rounded-lg overflow-hidden border bg-muted">
-                            {media.mediaUrl.includes('.mp4') || media.mediaUrl.includes('.webm') ? (
-                              <video
-                                src={media.mediaUrl}
-                                className="w-full h-full object-cover"
-                                controls
-                              />
-                            ) : (
-                              <Image
-                                src={media.mediaUrl}
-                                alt={`Media ${index + 1}`}
-                                width={200}
-                                height={120}
-                                className="w-full h-full object-cover"
-                              />
-                            )}
-                          </div>
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="sm"
-                            className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={() => handleDeleteMedia(index)}
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
+            {/* New Thumbnail Preview */}
+            {formData.thumbnailFile && (
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Thumbnail Baru Terpilih:</Label>
+                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-8 bg-background rounded border flex items-center justify-center">
+                      <Upload className="h-3 w-3 text-muted-foreground" />
+                    </div>
+                    <span className="text-sm truncate">{formData.thumbnailFile.name}</span>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setFormData(prev => ({ ...prev, thumbnailFile: null }))}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Media Upload */}
+          <div className="space-y-4">
+            <Label className="text-sm font-medium">Media Project (Opsional)</Label>
+
+            {/* Current Media Display */}
+            {project?.media && project.media.length > 0 && (
+              <div className="space-y-3">
+                <Label className="text-xs text-muted-foreground">Media Saat Ini:</Label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {project.media.map((media, index) => (
+                    !mediaDeleted.includes(index) && (
+                      <div key={index} className="relative group">
+                        <div className="aspect-video rounded-lg overflow-hidden border bg-muted">
+                          {media.mediaUrl.includes('.mp4') || media.mediaUrl.includes('.webm') ? (
+                            <video
+                              src={media.mediaUrl}
+                              className="w-full h-full object-cover"
+                              controls
+                            />
+                          ) : (
+                            <Image
+                              src={media.mediaUrl}
+                              alt={`Media ${index + 1}`}
+                              width={200}
+                              height={120}
+                              className="w-full h-full object-cover"
+                            />
+                          )}
                         </div>
-                      )
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-                <input
-                  type="file"
-                  id="media-upload"
-                  accept="image/*,video/*"
-                  multiple
-                  className="hidden"
-                  onChange={handleMediaUpload}
-                />
-                <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground mb-2">
-                  Upload gambar atau video tambahan (maksimal 5 file, 10MB per file)
-                </p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => document.getElementById('media-upload')?.click()}
-                >
-                  Tambah Media
-                </Button>
-              </div>
-
-              {/* Selected Media Files */}
-              {formData.mediaFiles.length > 0 && (
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">File Media Baru Terpilih:</Label>
-                  <div className="space-y-1">
-                    {formData.mediaFiles.map((file, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
-                        <span className="text-xs truncate">{file.name}</span>
                         <Button
                           type="button"
-                          variant="ghost"
+                          variant="destructive"
                           size="sm"
-                          onClick={() => removeMediaFile(index)}
+                          className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => handleDeleteMedia(index)}
                         >
                           <X className="h-3 w-3" />
                         </Button>
                       </div>
-                    ))}
-                  </div>
+                    )
+                  ))}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
-            {/* Submit Button */}
-            <div className="pt-4">
-              <Button 
-                type="submit" 
-                className="w-full" 
-                size="lg"
-                disabled={isLoading}
+            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+              <input
+                type="file"
+                id="media-upload"
+                accept="image/*,video/*"
+                multiple
+                className="hidden"
+                onChange={handleMediaUpload}
+              />
+              <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground mb-2">
+                Upload gambar atau video tambahan (maksimal 5 file, 10MB per file)
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => document.getElementById('media-upload')?.click()}
               >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Mengupdate Project...
-                  </>
-                ) : (
-                  'Update Project'
-                )}
+                Tambah Media
               </Button>
             </div>
-          </form>
-        </div>
+
+            {/* Selected Media Files */}
+            {formData.mediaFiles.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">File Media Baru Terpilih:</Label>
+                <div className="space-y-1">
+                  {formData.mediaFiles.map((file, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
+                      <span className="text-xs truncate">{file.name}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeMediaFile(index)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <div className="pt-4">
+            <Button
+              type="submit"
+              className="w-full"
+              size="lg"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Mengupdate Project...
+                </>
+              ) : (
+                'Update Project'
+              )}
+            </Button>
+          </div>
+        </form>
+      </div>
 
       {/* Vertical Separator - Fixed in center */}
       <div className="flex items-center justify-center">
@@ -669,7 +668,7 @@ export default function EditProjectPage() {
       {/* Right Side - Preview */}
       <div className="flex-1 flex flex-col items-center justify-center h-screen overflow-hidden p-6">
         <div className="w-full max-w-sm h-full flex items-center justify-center">
-          
+
           {/* Live Project Card Preview */}
           <div className="w-full max-h-full overflow-hidden">
             <div className="group relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 border border-border/50 shadow-sm h-full flex flex-col py-0 rounded-lg bg-card">
@@ -701,11 +700,11 @@ export default function EditProjectPage() {
                     </div>
                   </div>
                 )}
-                
+
                 {/* Category Badge */}
                 {formData.categoryId && (
-                  <Badge 
-                    variant="secondary" 
+                  <Badge
+                    variant="secondary"
                     className="absolute top-2 left-2 text-xs font-medium shadow-sm backdrop-blur-sm"
                     style={{
                       backgroundColor: categories.find(c => c.id === formData.categoryId)?.bgHex || undefined,
@@ -784,7 +783,7 @@ export default function EditProjectPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Konfirmasi Penghapusan</AlertDialogTitle>
             <AlertDialogDescription>
-              {deleteType === 'thumbnail' 
+              {deleteType === 'thumbnail'
                 ? 'Apakah Anda yakin ingin menghapus thumbnail ini? Tindakan ini tidak dapat dibatalkan.'
                 : 'Apakah Anda yakin ingin menghapus media ini? Tindakan ini tidak dapat dibatalkan.'
               }
