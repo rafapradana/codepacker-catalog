@@ -4,12 +4,12 @@ import { useState, useEffect } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
 import Image from "next/image"
-import { 
-  Home, 
-  Search, 
-  Plus, 
-  LayoutGrid, 
-  UserRound, 
+import {
+  Home,
+  Search,
+  Plus,
+  LayoutGrid,
+  UserRound,
   MessageSquare,
   HomeIcon,
   SearchIcon,
@@ -60,7 +60,7 @@ const mainMenuItems = [
     href: "/app/create/project",
     icon: Plus,
     iconFilled: Plus,
-    isSpecial: true,
+    isSpecial: true, // Makes it visually prominent
   },
   {
     id: "cari-dan-jelajahi-projects",
@@ -104,7 +104,7 @@ export function StudentSidebar({ currentPage, onPageChange }: StudentSidebarProp
       setFeedbackModalOpen(true)
       return
     }
-    
+
     onPageChange(item.label.toLowerCase())
     router.push(item.href)
   }
@@ -142,24 +142,18 @@ export function StudentSidebar({ currentPage, onPageChange }: StudentSidebarProp
                   <button
                     onClick={() => handleMenuClick(item)}
                     className={cn(
-                      "p-2 rounded-lg transition-all duration-200 hover:bg-accent",
+                      "p-2 rounded-lg transition-all duration-200",
                       item.isSpecial
                         ? active
-                          ? "bg-white text-black"
-                          : "bg-muted text-muted-foreground hover:bg-muted/80"
+                          ? "bg-accent text-foreground border border-primary/30" // Special button when active
+                          : "bg-accent/50 text-foreground border border-accent hover:bg-accent/70" // Special button stands out
                         : active
-                        ? "text-foreground"
-                        : "text-muted-foreground hover:text-foreground"
+                          ? "text-foreground hover:bg-accent" // Regular active
+                          : "text-muted-foreground hover:bg-accent hover:text-foreground" // Regular default
                     )}
                     suppressHydrationWarning
                   >
-                    <IconComponent 
-                      size={20} 
-                      className={cn(
-                        item.isSpecial && active ? "text-black" : "",
-                        item.isSpecial && !active ? "text-white" : ""
-                      )}
-                    />
+                    <IconComponent size={20} />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="right">
@@ -201,9 +195,9 @@ export function StudentSidebar({ currentPage, onPageChange }: StudentSidebarProp
       </div>
 
       {/* Feedback Modal */}
-      <FeedbackModal 
-        open={feedbackModalOpen} 
-        onOpenChange={setFeedbackModalOpen} 
+      <FeedbackModal
+        open={feedbackModalOpen}
+        onOpenChange={setFeedbackModalOpen}
       />
     </TooltipProvider>
   )
